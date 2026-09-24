@@ -676,6 +676,12 @@ input,select,textarea{font:inherit}
 @media(max-width:560px){.mercado-grelha{grid-template-columns:1fr}}
 .mercado-bloco{background:#fff;border:1px solid var(--linha);border-radius:var(--raio-xs);padding:14px}
 .mercado-bloco .mercado-titulo-mini{margin-bottom:10px;display:block}
+.ou-grelha{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ou-col-titulo{font-size:10px;font-weight:900;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.ou-col-titulo.over{color:var(--verde-600)}
+.ou-col-titulo.under{color:var(--vermelho)}
+.ou-lista{display:flex;flex-direction:column;gap:6px}
+.mercado-secao-titulo{font-size:12px;font-weight:900;color:var(--verde-800);letter-spacing:1.5px;text-transform:uppercase;margin:8px 0 4px;padding:6px 10px;background:linear-gradient(90deg,rgba(118,255,3,.15),transparent);border-left:3px solid var(--lima);border-radius:4px}
 </style>
 </head>
 <body>
@@ -1190,9 +1196,6 @@ const LS_TORNEIOS = 'fp_torneios_v1';
 
 const EMAIL_COMPROVATIVO = 'apostasspp@gmail.com';
 
-/* ══════════════════════════════════════════════════════════════
-   FIREBASE REALTIME DATABASE — INICIALIZAÇÃO
-   ══════════════════════════════════════════════════════════════ */
 const firebaseConfig = {
   apiKey: "AIzaSyAnjuE-OqJQpuvAi7goUut54kTXvKr8DX0",
   authDomain: "freepremier.firebaseapp.com",
@@ -1245,7 +1248,6 @@ function atualizarStatusFirebase(estado, txt) {
   if (t) t.textContent = txt;
 }
 
-/* ── Envia dados para o Firebase (debounced por chave) ── */
 const _fbWriteTimers = {};
 function _fbEnviar(chave, valor) {
   if (!fbReady || !fbDb) return;
@@ -1263,7 +1265,6 @@ function _fbEnviar(chave, valor) {
   }, 80);
 }
 
-/* ── Wrappers que substituem ler/gravar do localStorage ── */
 const _lsGet = k => { try { return localStorage.getItem(k); } catch { return null; } };
 const _lsSet = (k,v) => { try { localStorage.setItem(k, v); } catch {} };
 
@@ -1276,7 +1277,6 @@ const gravar = (chave, valor) => {
   if (fbReady && !fbIgnorarProximo) _fbEnviar(chave, valor);
 };
 
-/* ── Carrega tudo do Firebase para o localStorage (merge de users/eventos) ── */
 async function carregarTudoDoFirebase() {
   if (!fbDb) return false;
   try {
@@ -1338,7 +1338,6 @@ async function carregarTudoDoFirebase() {
   }
 }
 
-/* ── Listeners em tempo real ── */
 function ativarListenersFirebase() {
   if (!fbDb) return;
   Object.entries(FB_MAP).forEach(([chave, path]) => {
@@ -1375,7 +1374,6 @@ function ativarListenersFirebase() {
   } catch {}
 }
 
-/* ── Re-render após sync do Firebase ── */
 function rerenderAposSync(chave) {
   try {
     const sessao = sessaoAtual();
@@ -1429,10 +1427,6 @@ function rerenderAposSync(chave) {
     console.warn('[FIREBASE] Erro no re-render:', e);
   }
 }
-
-/* ══════════════════════════════════════════════════════════════
-   resto do código (idêntico ao original)
-   ══════════════════════════════════════════════════════════════ */
 
 function partesLocais(date) {
   const d = date instanceof Date ? date : new Date(date);
@@ -1593,8 +1587,207 @@ function probGolosTotal(ev,linha,lado){const est=estadoJogo(ev);const f=golosFin
 function probGolosEquipa(ev,ladoEquipa,linha,lado){const est=estadoJogo(ev);const f=golosFinais(ev);if(est.fase==='terminado'){const g=ladoEquipa==='casa'?f.casa:f.fora;if(lado==='over')return g>linha?1:0;return g<linha?1:0;}let rC=0,rF=0;if(est.fase!=='agendado'){const r=contagemGolos(ev,est.minuto);rC=r.casa;rF=r.fora;}const totalRem=minutosRestantes(ev)/90;const lam=lambdasBase(ev);const lamEq=(ladoEquipa==='casa'?lam.casa:lam.fora)*totalRem;const rEq=ladoEquipa==='casa'?rC:rF;const maxK=12;let probOver=0,probUnder=0;for(let k=0;k<=maxK;k++){const p=poisson(k,lamEq);const total=rEq+k;if(total>linha)probOver+=p;if(total<linha)probUnder+=p;}const soma=probOver+probUnder||1;if(lado==='over')return probOver/soma;return probUnder/soma;}
 function probAmbasMarcam(ev,ladoSim){const est=estadoJogo(ev);const f=golosFinais(ev);if(est.fase==='terminado'){const ambas=f.casa>0&&f.fora>0;return ladoSim?(ambas?1:0):(ambas?0:1);}let rC=0,rF=0;if(est.fase!=='agendado'){const r=contagemGolos(ev,est.minuto);rC=r.casa;rF=r.fora;}const totalRem=minutosRestantes(ev)/90;const lam=lambdasBase(ev);const lamC=lam.casa*totalRem,lamF=lam.fora*totalRem;let probAmbas=0;const maxK=8;for(let h=0;h<=maxK;h++){const pH=poisson(h,lamC);for(let a=0;a<=maxK;a++){const p=pH*poisson(a,lamF);const fc=rC+h,ff=rF+a;if(fc>0&&ff>0)probAmbas+=p;}}if(ladoSim)return probAmbas;return 1-probAmbas;}
 function probParteMaisGolos(ev,escolha){const est=estadoJogo(ev);const f=golosFinais(ev);const ht=contagemGolos(ev,45);const g1=ht.casa+ht.fora;const g2=(f.casa+f.fora)-g1;if(est.fase==='terminado'||est.fase==='intervalo'||est.fase==='segunda'){if(escolha==='1')return g1>g2?1:0;if(escolha==='X')return g1===g2?1:0;return g2>g1?1:0;}let g1Atual=0,g2Atual=0;if(est.fase==='primeira'){const r=contagemGolos(ev,est.minuto);g1Atual=r.casa+r.fora;g2Atual=0;}const lam=lambdasBase(ev);const lamTotal1=(lam.casa+lam.fora)*(Math.max(0,45-(est.fase==='primeira'?est.minuto:0))/90);const lamTotal2=(lam.casa+lam.fora)*(Math.max(0,90-Math.max(45,est.fase==='segunda'?est.minuto:0))/90);let p1=0,pX=0,p2=0;const maxK=8;for(let a=0;a<=maxK;a++){const pA=poisson(a,lamTotal1);for(let b=0;b<=maxK;b++){const p=pA*poisson(b,lamTotal2);const total1=g1Atual+a;const total2=g2Atual+b;if(total1>total2)p1+=p;else if(total1===total2)pX+=p;else p2+=p;}}const soma=p1+pX+p2||1;if(escolha==='1')return p1/soma;if(escolha==='X')return pX/soma;return p2/soma;}
-function probGolosParteEquipa(ev,parte,ladoEquipa,linha,lado){const est=estadoJogo(ev);const f=golosFinais(ev);const ht=contagemGolos(ev,45);let g1C=ht.casa,g1F=ht.fora;let g2C=Math.max(0,f.casa-g1C),g2F=Math.max(0,f.fora-g1F);if(est.fase==='terminado'){const g=parte==='1'?(ladoEquipa==='casa'?g1C:g1F):(ladoEquipa==='casa'?g2C:g2F);if(lado==='over')return g>linha?1:0;return g<linha?1:0;}if(parte==='1'){if(est.fase==='intervalo'||est.fase==='segunda'){const g=ladoEquipa==='casa'?g1C:g1F;if(lado==='over')return g>linha?1:0;return g<linha?1:0;}}else{if(est.fase==='segunda'){const g=ladoEquipa==='casa'?g2C:g2F;if(lado==='over')return g>linha?1:0;return g<linha?1:0;}}let baseC=parte==='1'?g1C:g2C;let baseF=parte==='1'?g1F:g2F;let minRem=parte==='1'?Math.max(0,45-(est.fase==='primeira'?est.minuto:0)):Math.max(0,45-(est.fase==='segunda'?est.minuto-45:0));if(est.fase==='intervalo'&&parte==='2')minRem=45;const totalRem=minRem/90;const lam=lambdasBase(ev);const lamEq=(ladoEquipa==='casa'?lam.casa:lam.fora)*totalRem;const baseEq=ladoEquipa==='casa'?baseC:baseF;let probOver=0,probUnder=0;const maxK=10;for(let k=0;k<=maxK;k++){const p=poisson(k,lamEq);const total=baseEq+k;if(total>linha)probOver+=p;if(total<linha)probUnder+=p;}const soma=probOver+probUnder||1;if(lado==='over')return probOver/soma;return probUnder/soma;}
-function oddsMercadosExtra(ev){const p90=probs90Mercado(ev);const pHt=probsHTMercado(ev);return{empate:probParaOdd(p90.empate),dupla1X:probParaOdd(p90.casa+p90.empate),dupla12:probParaOdd(p90.casa+p90.fora),duplaX2:probParaOdd(p90.empate+p90.fora),ht1:probParaOdd(pHt.casa),htX:probParaOdd(pHt.empate),ht2:probParaOdd(pHt.fora),total_0:probParaOdd(probGolosTotal(ev,0,'over')),total_1:probParaOdd(probGolosTotal(ev,1,'over')),total_2:probParaOdd(probGolosTotal(ev,2,'over')),total_3:probParaOdd(probGolosTotal(ev,3,'over')),total_4:probParaOdd(probGolosTotal(ev,4,'over')),total_5:probParaOdd(probGolosTotal(ev,5,'over')),total_6:probParaOdd(probGolosTotal(ev,6,'over')),total_menos_1:probParaOdd(probGolosTotal(ev,1,'under')),total_menos_2:probParaOdd(probGolosTotal(ev,2,'under')),total_menos_3:probParaOdd(probGolosTotal(ev,3,'under')),total_menos_4:probParaOdd(probGolosTotal(ev,4,'under')),total_menos_5:probParaOdd(probGolosTotal(ev,5,'under')),total_menos_6:probParaOdd(probGolosTotal(ev,6,'under')),casa_0:probParaOdd(probGolosEquipa(ev,'casa',0,'over')),casa_1:probParaOdd(probGolosEquipa(ev,'casa',1,'over')),casa_2:probParaOdd(probGolosEquipa(ev,'casa',2,'over')),casa_3:probParaOdd(probGolosEquipa(ev,'casa',3,'over')),casa_4:probParaOdd(probGolosEquipa(ev,'casa',4,'over')),casa_menos_1:probParaOdd(probGolosEquipa(ev,'casa',1,'under')),casa_menos_2:probParaOdd(probGolosEquipa(ev,'casa',2,'under')),casa_menos_3:probParaOdd(probGolosEquipa(ev,'casa',3,'under')),casa_menos_4:probParaOdd(probGolosEquipa(ev,'casa',4,'under')),fora_0:probParaOdd(probGolosEquipa(ev,'fora',0,'over')),fora_1:probParaOdd(probGolosEquipa(ev,'fora',1,'over')),fora_2:probParaOdd(probGolosEquipa(ev,'fora',2,'over')),fora_3:probParaOdd(probGolosEquipa(ev,'fora',3,'over')),fora_4:probParaOdd(probGolosEquipa(ev,'fora',4,'over')),fora_menos_1:probParaOdd(probGolosEquipa(ev,'fora',1,'under')),fora_menos_2:probParaOdd(probGolosEquipa(ev,'fora',2,'under')),fora_menos_3:probParaOdd(probGolosEquipa(ev,'fora',3,'under')),fora_menos_4:probParaOdd(probGolosEquipa(ev,'fora',4,'under')),btts_sim:probParaOdd(probAmbasMarcam(ev,true)),btts_nao:probParaOdd(probAmbasMarcam(ev,false)),parte_1:probParaOdd(probParteMaisGolos(ev,'1')),parte_X:probParaOdd(probParteMaisGolos(ev,'X')),parte_2:probParaOdd(probParteMaisGolos(ev,'2')),ht_total_0:probParaOdd(probGolosTotal({...ev,_htOnly:true},0,'over')),ht_total_1:probParaOdd(probGolosTotal({...ev,_htOnly:true},1,'over')),ht_total_2:probParaOdd(probGolosTotal({...ev,_htOnly:true},2,'over')),ht_total_3:probParaOdd(probGolosTotal({...ev,_htOnly:true},3,'over')),ht_total_4:probParaOdd(probGolosTotal({...ev,_htOnly:true},4,'over')),ht_total_5:probParaOdd(probGolosTotal({...ev,_htOnly:true},5,'over')),ht_menos_1:probParaOdd(probGolosTotal({...ev,_htOnly:true},1,'under')),ht_menos_2:probParaOdd(probGolosTotal({...ev,_htOnly:true},2,'under')),ht_menos_3:probParaOdd(probGolosTotal({...ev,_htOnly:true},3,'under')),ht_menos_4:probParaOdd(probGolosTotal({...ev,_htOnly:true},4,'under')),ht_menos_5:probParaOdd(probGolosTotal({...ev,_htOnly:true},5,'under')),ht_casa_0:probParaOdd(probGolosParteEquipa(ev,'1','casa',0,'over')),ht_casa_1:probParaOdd(probGolosParteEquipa(ev,'1','casa',1,'over')),ht_casa_2:probParaOdd(probGolosParteEquipa(ev,'1','casa',2,'over')),ht_casa_3:probParaOdd(probGolosParteEquipa(ev,'1','casa',3,'over')),ht_casa_4:probParaOdd(probGolosParteEquipa(ev,'1','casa',4,'over')),ht_casa_menos_1:probParaOdd(probGolosParteEquipa(ev,'1','casa',1,'under')),ht_casa_menos_2:probParaOdd(probGolosParteEquipa(ev,'1','casa',2,'under')),ht_casa_menos_3:probParaOdd(probGolosParteEquipa(ev,'1','casa',3,'under')),ht_casa_menos_4:probParaOdd(probGolosParteEquipa(ev,'1','casa',4,'under')),ht_fora_0:probParaOdd(probGolosParteEquipa(ev,'1','fora',0,'over')),ht_fora_1:probParaOdd(probGolosParteEquipa(ev,'1','fora',1,'over')),ht_fora_2:probParaOdd(probGolosParteEquipa(ev,'1','fora',2,'over')),ht_fora_3:probParaOdd(probGolosParteEquipa(ev,'1','fora',3,'over')),ht_fora_4:probParaOdd(probGolosParteEquipa(ev,'1','fora',4,'over')),ht_fora_menos_1:probParaOdd(probGolosParteEquipa(ev,'1','fora',1,'under')),ht_fora_menos_2:probParaOdd(probGolosParteEquipa(ev,'1','fora',2,'under')),ht_fora_menos_3:probParaOdd(probGolosParteEquipa(ev,'1','fora',3,'under')),ht_fora_menos_4:probParaOdd(probGolosParteEquipa(ev,'1','fora',4,'under')),st_casa_0:probParaOdd(probGolosParteEquipa(ev,'2','casa',0,'over')),st_casa_1:probParaOdd(probGolosParteEquipa(ev,'2','casa',1,'over')),st_casa_2:probParaOdd(probGolosParteEquipa(ev,'2','casa',2,'over')),st_casa_3:probParaOdd(probGolosParteEquipa(ev,'2','casa',3,'over')),st_casa_4:probParaOdd(probGolosParteEquipa(ev,'2','casa',4,'over')),st_casa_menos_1:probParaOdd(probGolosParteEquipa(ev,'2','casa',1,'under')),st_casa_menos_2:probParaOdd(probGolosParteEquipa(ev,'2','casa',2,'under')),st_casa_menos_3:probParaOdd(probGolosParteEquipa(ev,'2','casa',3,'under')),st_casa_menos_4:probParaOdd(probGolosParteEquipa(ev,'2','casa',4,'under')),st_fora_0:probParaOdd(probGolosParteEquipa(ev,'2','fora',0,'over')),st_fora_1:probParaOdd(probGolosParteEquipa(ev,'2','fora',1,'over')),st_fora_2:probParaOdd(probGolosParteEquipa(ev,'2','fora',2,'over')),st_fora_3:probParaOdd(probGolosParteEquipa(ev,'2','fora',3,'over')),st_fora_4:probParaOdd(probGolosParteEquipa(ev,'2','fora',4,'over')),st_fora_menos_1:probParaOdd(probGolosParteEquipa(ev,'2','fora',1,'under')),st_fora_menos_2:probParaOdd(probGolosParteEquipa(ev,'2','fora',2,'under')),st_fora_menos_3:probParaOdd(probGolosParteEquipa(ev,'2','fora',3,'under')),st_fora_menos_4:probParaOdd(probGolosParteEquipa(ev,'2','fora',4,'under'))};}
+function probGolosParteEquipa(ev,parte,ladoEquipa,linha,lado){const est=estadoJogo(ev);const f=golosFinais(ev);const ht=contagemGolos(ev,45);const g1C=ht.casa,g1F=ht.fora;const g2C=Math.max(0,f.casa-g1C),g2F=Math.max(0,f.fora-g1F);if(est.fase==='terminado'){const g=parte==='1'?(ladoEquipa==='casa'?g1C:g1F):(ladoEquipa==='casa'?g2C:g2F);if(lado==='over')return g>linha?1:0;return g<linha?1:0;}if(parte==='1'){if(est.fase==='intervalo'||est.fase==='segunda'){const g=ladoEquipa==='casa'?g1C:g1F;if(lado==='over')return g>linha?1:0;return g<linha?1:0;}}else{if(est.fase==='segunda'){const r=contagemGolos(ev,est.minuto);const rC=Math.max(0,r.casa-g1C);const rF=Math.max(0,r.fora-g1F);const g=ladoEquipa==='casa'?rC:rF;if(lado==='over')return g>linha?1:0;return g<linha?1:0;}}let baseC=parte==='1'?g1C:g2C;let baseF=parte==='1'?g1F:g2F;let minRem=45;if(parte==='1'){if(est.fase==='primeira')minRem=Math.max(0,45-est.minuto);else minRem=45;}else{if(est.fase==='segunda')minRem=Math.max(0,90-est.minuto);else minRem=45;}const totalRem=minRem/90;const lam=lambdasBase(ev);const lamEq=(ladoEquipa==='casa'?lam.casa:lam.fora)*totalRem;const baseEq=ladoEquipa==='casa'?baseC:baseF;let probOver=0,probUnder=0;const maxK=10;for(let k=0;k<=maxK;k++){const p=poisson(k,lamEq);const total=baseEq+k;if(total>linha)probOver+=p;if(total<linha)probUnder+=p;}const soma=probOver+probUnder||1;if(lado==='over')return probOver/soma;return probUnder/soma;}
+
+/* ═══ NOVOS MERCADOS: Total golos por parte, ambas marcam por parte, 1x2 por parte ═══ */
+function probGolosTotalParte(ev,parte,linha,lado){
+  const est=estadoJogo(ev);
+  const f=golosFinais(ev);
+  const ht=contagemGolos(ev,45);
+  const g1C=ht.casa,g1F=ht.fora;
+  const g2C=Math.max(0,f.casa-g1C),g2F=Math.max(0,f.fora-g1F);
+  if(est.fase==='terminado'){
+    const g=parte==='1'?(g1C+g1F):(g2C+g2F);
+    if(lado==='over')return g>linha?1:0;
+    return g<linha?1:0;
+  }
+  if(parte==='1'&&(est.fase==='intervalo'||est.fase==='segunda')){
+    const g=g1C+g1F;
+    if(lado==='over')return g>linha?1:0;
+    return g<linha?1:0;
+  }
+  let baseGoals=0,minRem=45;
+  if(parte==='1'){
+    if(est.fase==='primeira'){
+      const r=contagemGolos(ev,est.minuto);
+      baseGoals=r.casa+r.fora;
+      minRem=Math.max(0,45-est.minuto);
+    }
+  }else{
+    if(est.fase==='segunda'){
+      const r=contagemGolos(ev,est.minuto);
+      baseGoals=Math.max(0,r.casa-g1C)+Math.max(0,r.fora-g1F);
+      minRem=Math.max(0,90-est.minuto);
+    }
+  }
+  const lam=lambdasBase(ev);
+  const fator=minRem/90;
+  const lamTotal=(lam.casa+lam.fora)*fator;
+  let probOver=0,probUnder=0;
+  const maxK=12;
+  for(let k=0;k<=maxK;k++){
+    const p=poisson(k,lamTotal);
+    const total=baseGoals+k;
+    if(total>linha)probOver+=p;
+    if(total<linha)probUnder+=p;
+  }
+  const soma=probOver+probUnder||1;
+  if(lado==='over')return probOver/soma;
+  return probUnder/soma;
+}
+function probAmbasMarcamParte(ev,parte,ladoSim){
+  const est=estadoJogo(ev);
+  const f=golosFinais(ev);
+  const ht=contagemGolos(ev,45);
+  const g1C=ht.casa,g1F=ht.fora;
+  const g2C=Math.max(0,f.casa-g1C),g2F=Math.max(0,f.fora-g1F);
+  const pC=parte==='1'?g1C:g2C;
+  const pF=parte==='1'?g1F:g2F;
+  if(est.fase==='terminado'){
+    const ambas=pC>0&&pF>0;
+    return ladoSim?(ambas?1:0):(ambas?0:1);
+  }
+  if(parte==='1'&&(est.fase==='intervalo'||est.fase==='segunda')){
+    const ambas=g1C>0&&g1F>0;
+    return ladoSim?(ambas?1:0):(ambas?0:1);
+  }
+  let baseC=0,baseF=0,minRem=45;
+  if(parte==='1'){
+    if(est.fase==='primeira'){
+      const r=contagemGolos(ev,est.minuto);
+      baseC=r.casa;baseF=r.fora;
+      minRem=Math.max(0,45-est.minuto);
+    }
+  }else{
+    if(est.fase==='segunda'){
+      const r=contagemGolos(ev,est.minuto);
+      baseC=Math.max(0,r.casa-g1C);
+      baseF=Math.max(0,r.fora-g1F);
+      minRem=Math.max(0,90-est.minuto);
+    }
+  }
+  const lam=lambdasBase(ev);
+  const fator=minRem/90;
+  const lamC=lam.casa*fator,lamF=lam.fora*fator;
+  let probAmbas=0;
+  const maxK=8;
+  for(let h=0;h<=maxK;h++){
+    const pH=poisson(h,lamC);
+    for(let a=0;a<=maxK;a++){
+      const p=pH*poisson(a,lamF);
+      const fc=baseC+h,ff=baseF+a;
+      if(fc>0&&ff>0)probAmbas+=p;
+    }
+  }
+  if(ladoSim)return probAmbas;
+  return 1-probAmbas;
+}
+function prob1x2Parte(ev,parte,escolha){
+  const est=estadoJogo(ev);
+  const f=golosFinais(ev);
+  const ht=contagemGolos(ev,45);
+  const g1C=ht.casa,g1F=ht.fora;
+  const g2C=Math.max(0,f.casa-g1C),g2F=Math.max(0,f.fora-g1F);
+  const pC=parte==='1'?g1C:g2C;
+  const pF=parte==='1'?g1F:g2F;
+  if(est.fase==='terminado'){
+    if(escolha==='1')return pC>pF?1:0;
+    if(escolha==='X')return pC===pF?1:0;
+    return pF>pC?1:0;
+  }
+  if(parte==='1'&&(est.fase==='intervalo'||est.fase==='segunda')){
+    if(escolha==='1')return g1C>g1F?1:0;
+    if(escolha==='X')return g1C===g1F?1:0;
+    return g1F>g1C?1:0;
+  }
+  let baseC=0,baseF=0,minRem=45;
+  if(parte==='1'){
+    if(est.fase==='primeira'){
+      const r=contagemGolos(ev,est.minuto);
+      baseC=r.casa;baseF=r.fora;
+      minRem=Math.max(0,45-est.minuto);
+    }
+  }else{
+    if(est.fase==='segunda'){
+      const r=contagemGolos(ev,est.minuto);
+      baseC=Math.max(0,r.casa-g1C);
+      baseF=Math.max(0,r.fora-g1F);
+      minRem=Math.max(0,90-est.minuto);
+    }
+  }
+  const lam=lambdasBase(ev);
+  const fator=minRem/90;
+  const lamC=lam.casa*fator,lamF=lam.fora*fator;
+  let p1=0,pX=0,p2=0;
+  const maxK=10;
+  for(let h=0;h<=maxK;h++){
+    const pH=poisson(h,lamC);
+    for(let a=0;a<=maxK;a++){
+      const p=pH*poisson(a,lamF);
+      const fc=baseC+h,ff=baseF+a;
+      if(fc>ff)p1+=p;
+      else if(fc===ff)pX+=p;
+      else p2+=p;
+    }
+  }
+  const soma=p1+pX+p2||1;
+  if(escolha==='1')return p1/soma;
+  if(escolha==='X')return pX/soma;
+  return p2/soma;
+}
+
+function oddsMercadosExtra(ev){
+  const p90=probs90Mercado(ev);
+  const pHt=probsHTMercado(ev);
+  const o={};
+  // 1X2 e Dupla
+  o.empate=probParaOdd(p90.empate);
+  o.dupla1X=probParaOdd(p90.casa+p90.empate);
+  o.dupla12=probParaOdd(p90.casa+p90.fora);
+  o.duplaX2=probParaOdd(p90.empate+p90.fora);
+  o.ht1=probParaOdd(pHt.casa);
+  o.htX=probParaOdd(pHt.empate);
+  o.ht2=probParaOdd(pHt.fora);
+  // Total 90' O/U
+  for(let n=0;n<=6;n++)o['total_'+n]=probParaOdd(probGolosTotal(ev,n,'over'));
+  for(let n=1;n<=6;n++)o['total_menos_'+n]=probParaOdd(probGolosTotal(ev,n,'under'));
+  // Casa / Fora 90' O/U
+  for(let n=0;n<=4;n++){o['casa_'+n]=probParaOdd(probGolosEquipa(ev,'casa',n,'over'));o['fora_'+n]=probParaOdd(probGolosEquipa(ev,'fora',n,'over'));}
+  for(let n=1;n<=4;n++){o['casa_menos_'+n]=probParaOdd(probGolosEquipa(ev,'casa',n,'under'));o['fora_menos_'+n]=probParaOdd(probGolosEquipa(ev,'fora',n,'under'));}
+  // BTTS 90'
+  o.btts_sim=probParaOdd(probAmbasMarcam(ev,true));
+  o.btts_nao=probParaOdd(probAmbasMarcam(ev,false));
+  // Parte com mais golos
+  o.parte_1=probParaOdd(probParteMaisGolos(ev,'1'));
+  o.parte_X=probParaOdd(probParteMaisGolos(ev,'X'));
+  o.parte_2=probParaOdd(probParteMaisGolos(ev,'2'));
+  // 1ª PARTE — Total golos O/U (0-5)
+  for(let n=0;n<=5;n++)o['ht_total_'+n]=probParaOdd(probGolosTotalParte(ev,'1',n,'over'));
+  for(let n=1;n<=5;n++)o['ht_menos_'+n]=probParaOdd(probGolosTotalParte(ev,'1',n,'under'));
+  // 1ª PARTE — Golos Casa O/U (0-5)
+  for(let n=0;n<=5;n++)o['ht_casa_'+n]=probParaOdd(probGolosParteEquipa(ev,'1','casa',n,'over'));
+  for(let n=1;n<=5;n++)o['ht_casa_menos_'+n]=probParaOdd(probGolosParteEquipa(ev,'1','casa',n,'under'));
+  // 1ª PARTE — Golos Fora O/U (0-5)
+  for(let n=0;n<=5;n++)o['ht_fora_'+n]=probParaOdd(probGolosParteEquipa(ev,'1','fora',n,'over'));
+  for(let n=1;n<=5;n++)o['ht_fora_menos_'+n]=probParaOdd(probGolosParteEquipa(ev,'1','fora',n,'under'));
+  // 1ª PARTE — Ambas marcam
+  o.ht_btts_sim=probParaOdd(probAmbasMarcamParte(ev,'1',true));
+  o.ht_btts_nao=probParaOdd(probAmbasMarcamParte(ev,'1',false));
+  // 2ª PARTE — 1X2
+  o.st_1=probParaOdd(prob1x2Parte(ev,'2','1'));
+  o.st_X=probParaOdd(prob1x2Parte(ev,'2','X'));
+  o.st_2=probParaOdd(prob1x2Parte(ev,'2','2'));
+  // 2ª PARTE — Total golos O/U
+  for(let n=0;n<=5;n++)o['st_total_'+n]=probParaOdd(probGolosTotalParte(ev,'2',n,'over'));
+  for(let n=1;n<=5;n++)o['st_menos_'+n]=probParaOdd(probGolosTotalParte(ev,'2',n,'under'));
+  // 2ª PARTE — Golos Casa O/U
+  for(let n=0;n<=5;n++)o['st_casa_'+n]=probParaOdd(probGolosParteEquipa(ev,'2','casa',n,'over'));
+  for(let n=1;n<=5;n++)o['st_casa_menos_'+n]=probParaOdd(probGolosParteEquipa(ev,'2','casa',n,'under'));
+  // 2ª PARTE — Golos Fora O/U
+  for(let n=0;n<=5;n++)o['st_fora_'+n]=probParaOdd(probGolosParteEquipa(ev,'2','fora',n,'over'));
+  for(let n=1;n<=5;n++)o['st_fora_menos_'+n]=probParaOdd(probGolosParteEquipa(ev,'2','fora',n,'under'));
+  return o;
+}
 
 /* CHAT */
 function obterChats(){const c=ler(LS_CHATS,null);if(!c||typeof c!=='object')return{};return c;}
@@ -1651,7 +1844,6 @@ function pararAutoSync365(){if(SYNC_ESTADO.timer365){clearInterval(SYNC_ESTADO.t
 function pararAutoSyncSofa(){if(SYNC_ESTADO.timerSofa){clearInterval(SYNC_ESTADO.timerSofa);SYNC_ESTADO.timerSofa=null;}}
 function iniciarAutoSync(){const cfg=obterSyncConfig();pararAutoSyncTdb();if(cfg.autoAtivado)SYNC_ESTADO.timerTdb=setInterval(()=>{if(!SYNC_ESTADO.aCorrer&&ehAdmin())sincronizarJogos({somenteAPI:true,silencioso:true});},AUTO_SYNC_INTERVAL_MS);pararAutoSync365();if(cfg.auto365)SYNC_ESTADO.timer365=setInterval(()=>{if(!SYNC_ESTADO.aCorrer&&ehAdmin())importarDo365Scores({silencioso:true});},AUTO_SYNC_INTERVAL_MS);pararAutoSyncSofa();if(cfg.autoSofa)SYNC_ESTADO.timerSofa=setInterval(()=>{if(!SYNC_ESTADO.aCorrer&&ehAdmin())importarDoSofascore({silencioso:true});},AUTO_SYNC_INTERVAL_MS);atualizarStatusSync('','idle');atualizarStatus365('','idle');atualizarStatusSofa('','idle');}
 
-/* EVENTOS — armazenamento */
 const IDS_EVENTOS_ANTIGOS_PADRAO = new Set([1,2,3,4,5,6,7,8,9,10,11,12,13,14,15]);
 let CACHE_EVENTOS = null;
 function obterEventos(){if(CACHE_EVENTOS)return CACHE_EVENTOS;const guardado=ler(LS_EVENTOS,null);let lista=Array.isArray(guardado)?guardado.slice():[];let mudou=false;const filtrados=lista.filter(e=>!IDS_EVENTOS_ANTIGOS_PADRAO.has(e.id));if(filtrados.length!==lista.length){lista=filtrados;mudou=true;}lista.forEach(ev=>{if(!ev.esporte){ev.esporte='futebol';mudou=true;}if(!Array.isArray(ev.golosLista)){if(ev.esporte==='futebol')ev.golosLista=converterGolosAntigos(ev);else{ev.golosLista=[];if(typeof ev.pontosCasa!=='number')ev.pontosCasa=80+Math.floor(Math.random()*40);if(typeof ev.pontosFora!=='number')ev.pontosFora=80+Math.floor(Math.random()*40);}mudou=true;}});if(mudou)gravar(LS_EVENTOS,lista);CACHE_EVENTOS=lista;return CACHE_EVENTOS;}
@@ -1667,7 +1859,7 @@ function toggleSelecao(sel){let lista=obterBoletim();const existente=lista.find(
 function atualizarBotaoBoletim(){const fab=$('#boletimFab');if(!fab)return;const sessao=sessaoAtual();if(!sessao||sessao===ADMIN.telefone){fab.classList.add('hidden');return;}const n=obterBoletim().length;if(n===0)fab.classList.add('hidden');else{fab.classList.remove('hidden');$('#boletimCount').textContent=n;}}
 const EXPANDIDOS=new Set();
 function toggleExpansao(id){if(EXPANDIDOS.has(id))EXPANDIDOS.delete(id);else EXPANDIDOS.add(id);}
-function descricaoCurtaAposta(ap){const m=ap.mercado||'1x2';if(m==='1x2')return ap.equipa;if(m==='empate')return'Empate (90\')';if(m==='dupla')return'Dupla '+ap.dupla;if(m==='golos')return(ap.submercado==='over'?'Mais':'Menos')+' de '+ap.linha+' golos';if(m==='ht'){if(ap.ht==='1')return'1ª parte · '+ap.casa;if(ap.ht==='2')return'1ª parte · '+ap.fora;return'1ª parte · Empate';}if(m==='total_golos')return(ap.submercado==='over'?'Mais':'Menos')+' de '+ap.linha+' golos (90\')';if(m==='total_golos_casa')return(ap.submercado==='over'?'Casa mais':'Casa menos')+' de '+ap.linha+' golos';if(m==='total_golos_fora')return(ap.submercado==='over'?'Fora mais':'Fora menos')+' de '+ap.linha+' golos';if(m==='btts')return ap.sim?'Ambas marcam: Sim':'Ambas marcam: Não';if(m==='parte_mais_golos')return'Parte com mais golos: '+ap.escolha;if(m==='ht_golos')return(ap.submercado==='over'?'1ªP mais':'1ªP menos')+' de '+ap.linha+' golos';if(m==='ht_golos_casa')return(ap.submercado==='over'?'1ªP casa mais':'1ªP casa menos')+' de '+ap.linha;if(m==='ht_golos_fora')return(ap.submercado==='over'?'1ªP fora mais':'1ªP fora menos')+' de '+ap.linha;if(m==='st_golos_casa')return(ap.submercado==='over'?'2ªP casa mais':'2ªP casa menos')+' de '+ap.linha;if(m==='st_golos_fora')return(ap.submercado==='over'?'2ªP fora mais':'2ªP fora menos')+' de '+ap.linha;return'aposta';}
+function descricaoCurtaAposta(ap){const m=ap.mercado||'1x2';if(m==='1x2')return ap.equipa;if(m==='empate')return'Empate (90\')';if(m==='dupla')return'Dupla '+ap.dupla;if(m==='golos')return(ap.submercado==='over'?'Mais':'Menos')+' de '+ap.linha+' golos';if(m==='ht'){if(ap.ht==='1')return'1ª parte · '+ap.casa;if(ap.ht==='2')return'1ª parte · '+ap.fora;return'1ª parte · Empate';}if(m==='total_golos')return(ap.submercado==='over'?'Mais':'Menos')+' de '+ap.linha+' golos (90\')';if(m==='total_golos_casa')return(ap.submercado==='over'?'Casa mais':'Casa menos')+' de '+ap.linha+' golos';if(m==='total_golos_fora')return(ap.submercado==='over'?'Fora mais':'Fora menos')+' de '+ap.linha+' golos';if(m==='btts')return ap.sim?'Ambas marcam: Sim':'Ambas marcam: Não';if(m==='parte_mais_golos')return'Parte com mais golos: '+ap.escolha;if(m==='ht_golos')return(ap.submercado==='over'?'1ªP mais':'1ªP menos')+' de '+ap.linha+' golos';if(m==='ht_golos_casa')return(ap.submercado==='over'?'1ªP casa mais':'1ªP casa menos')+' de '+ap.linha;if(m==='ht_golos_fora')return(ap.submercado==='over'?'1ªP fora mais':'1ªP fora menos')+' de '+ap.linha;if(m==='ht_btts')return ap.sim?'1ªP ambas marcam: Sim':'1ªP ambas marcam: Não';if(m==='st_1x2'){if(ap.lado==='casa')return'2ªP · '+ap.casa;if(ap.lado==='empate')return'2ªP · Empate';return'2ªP · '+ap.fora;}if(m==='st_total_golos')return(ap.submercado==='over'?'2ªP mais':'2ªP menos')+' de '+ap.linha+' golos';if(m==='st_golos_casa')return(ap.submercado==='over'?'2ªP casa mais':'2ªP casa menos')+' de '+ap.linha;if(m==='st_golos_fora')return(ap.submercado==='over'?'2ªP fora mais':'2ªP fora menos')+' de '+ap.linha;return'aposta';}
 function descricaoMercadoBoletim(s){const m=s.mercado||'1x2';if(m==='1x2')return`Aposta em <b>${escapar(s.equipa)}</b>`;if(m==='empate')return`Empate (90')`;if(m==='dupla')return`Dupla hipótese <b>${s.dupla}</b>`;if(m==='golos')return`${s.submercado==='over'?'Mais':'Menos'} de ${s.linha} golos`;return escapar(s.equipa);}
 
 /* AUTENTICAÇÃO */
@@ -1718,7 +1910,248 @@ let FILTRO_ESPORTE='todos';
 function atualizarContadoresFiltro(){const eventos=obterEventos().filter(ev=>!eventoExpirado(ev));const cTodos=eventos.length;const cFut=eventos.filter(e=>(e.esporte||'futebol')==='futebol').length;const cBas=eventos.filter(e=>e.esporte==='basquetebol').length;const cAnd=eventos.filter(e=>e.esporte==='andebol').length;const cTen=eventos.filter(e=>e.esporte==='tenis').length;const cVol=eventos.filter(e=>e.esporte==='voleibol').length;const setT=$('#countTodos');if(setT)setT.textContent=cTodos;const setF=$('#countFutebol');if(setF)setF.textContent=cFut;const setB=$('#countBasquetebol');if(setB)setB.textContent=cBas;const setA=$('#countAndebol');if(setA)setA.textContent=cAnd;const setTen=$('#countTenis');if(setTen)setTen.textContent=cTen;const setVol=$('#countVoleibol');if(setVol)setVol.textContent=cVol;}
 (function ligarFiltrosMercado(){const el=$('#marketFiltros');if(!el)return;el.querySelectorAll('[data-esporte]').forEach(b=>{b.addEventListener('click',()=>{FILTRO_ESPORTE=b.dataset.esporte;el.querySelectorAll('.filtro-chip').forEach(x=>x.classList.toggle('active',x===b));renderizarMercado();});});})();
 
-function renderizarMercado(){const alvo=$('#listaEventos');if(!alvo)return;const todos=obterEventos().filter(ev=>!eventoExpirado(ev));atualizarContadoresFiltro();const eventos=FILTRO_ESPORTE==='todos'?todos:todos.filter(ev=>(ev.esporte||'futebol')===FILTRO_ESPORTE);if(!eventos.length){alvo.innerHTML=`<div class="vazio">${FILTRO_ESPORTE==='todos'?'Ainda não existem eventos disponíveis no mercado.<br><b>Aguarde a actualização de jogos em tempo real.</b>':`Não há jogos de <b>${ESPORTE_NOME[FILTRO_ESPORTE]}</b> de momento.`}</div>`;return;}const boletim=obterBoletim();alvo.innerHTML=eventos.map(ev=>{const esporte=ev.esporte||'futebol';const est=estadoJogo(ev);const odds=oddsDinamicas(ev);const terminado=est.fase==='terminado';const classes=['evento','esporte-'+esporte];if(est.live)classes.push('ao-vivo');if(terminado)classes.push('terminado');const isFutebol=esporte==='futebol';const selCasa=boletim.find(s=>s.eventoId===ev.id&&(s.mercado||'1x2')==='1x2'&&s.lado==='casa');const selFora=boletim.find(s=>s.eventoId===ev.id&&(s.mercado||'1x2')==='1x2'&&s.lado==='fora');const clsCasa=classeOdd(odds.oddCasa,Number(ev.oddCasa));const clsFora=classeOdd(odds.oddFora,Number(ev.oddFora));let extraHtml='';if(isFutebol){const mx=oddsMercadosExtra(ev);const aberto=EXPANDIDOS.has(ev.id);const selEmpate=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='empate');const selD1X=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='dupla'&&s.dupla==='1X');const selD12=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='dupla'&&s.dupla==='12');const selDX2=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='dupla'&&s.dupla==='X2');const selHt1=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='ht'&&s.ht==='1');const selHtX=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='ht'&&s.ht==='X');const selHt2=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='ht'&&s.ht==='2');extraHtml=`<button class="toggle-mercados ${aberto?'aberto':''}" type="button" data-toggle-extra="${ev.id}">${aberto?'▴ Ocultar mercados':'▾ Ver todos os mercados (mais de 70 opções)'}</button><div class="mercados-extra ${aberto?'':'hidden'}" data-extra-container="${ev.id}"><div class="mercado-grelha"><div class="mercado-bloco"><span class="mercado-titulo-mini">Resultado Final (90')</span><div class="mercado-opcoes uma" style="margin-bottom:8px"><button class="opcao-odd ${selEmpate?'selecionada':''}" type="button" data-extra="empate" data-evid="${ev.id}" ${terminado?'disabled':''}><span>Empate (X)</span><strong>${mx.empate.toFixed(2)}</strong></button></div><div class="mercado-opcoes"><button class="opcao-odd ${selD1X?'selecionada':''}" type="button" data-extra="dupla" data-dupla="1X" data-evid="${ev.id}" ${terminado?'disabled':''}><span>1X</span><strong>${mx.dupla1X.toFixed(2)}</strong></button><button class="opcao-odd ${selD12?'selecionada':''}" type="button" data-extra="dupla" data-dupla="12" data-evid="${ev.id}" ${terminado?'disabled':''}><span>12</span><strong>${mx.dupla12.toFixed(2)}</strong></button><button class="opcao-odd ${selDX2?'selecionada':''}" type="button" data-extra="dupla" data-dupla="X2" data-evid="${ev.id}" ${terminado?'disabled':''}><span>X2</span><strong>${mx.duplaX2.toFixed(2)}</strong></button></div></div><div class="mercado-bloco"><span class="mercado-titulo-mini">1ª Parte (45')</span><div class="mercado-opcoes"><button class="opcao-odd ${selHt1?'selecionada':''}" type="button" data-extra="ht" data-ht="1" data-evid="${ev.id}" ${terminado?'disabled':''}><span>1</span><strong>${mx.ht1.toFixed(2)}</strong></button><button class="opcao-odd ${selHtX?'selecionada':''}" type="button" data-extra="ht" data-ht="X" data-evid="${ev.id}" ${terminado?'disabled':''}><span>X</span><strong>${mx.htX.toFixed(2)}</strong></button><button class="opcao-odd ${selHt2?'selecionada':''}" type="button" data-extra="ht" data-ht="2" data-evid="${ev.id}" ${terminado?'disabled':''}><span>2</span><strong>${mx.ht2.toFixed(2)}</strong></button></div></div></div><div class="mercado-bloco"><span class="mercado-titulo-mini">Total de Golos na Partida (90')</span><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;"><div><div style="font-size:10px;font-weight:900;color:var(--verde-600);margin-bottom:4px;text-transform:uppercase;">Mais de</div><div class="mercado-opcoes uma" style="gap:6px;">${[0,1,2,3,4,5,6].map(n=>`<button class="opcao-odd" type="button" data-extra="total_golos" data-lado="over" data-linha="${n}" data-evid="${ev.id}" ${terminado?'disabled':''}><span>+ de ${n}</span><strong>${mx['total_'+n].toFixed(2)}</strong></button>`).join('')}</div></div><div><div style="font-size:10px;font-weight:900;color:var(--vermelho);margin-bottom:4px;text-transform:uppercase;">Menos de</div><div class="mercado-opcoes uma" style="gap:6px;">${[1,2,3,4,5,6].map(n=>`<button class="opcao-odd" type="button" data-extra="total_golos" data-lado="under" data-linha="${n}" data-evid="${ev.id}" ${terminado?'disabled':''}><span>- de ${n}</span><strong>${mx['total_menos_'+n].toFixed(2)}</strong></button>`).join('')}</div></div></div></div><div class="mercado-bloco"><span class="mercado-titulo-mini">Ambas marcam</span><div class="mercado-opcoes duas"><button class="opcao-odd" type="button" data-extra="btts" data-sim="1" data-evid="${ev.id}" ${terminado?'disabled':''}><span>Sim</span><strong>${mx.btts_sim.toFixed(2)}</strong></button><button class="opcao-odd" type="button" data-extra="btts" data-sim="0" data-evid="${ev.id}" ${terminado?'disabled':''}><span>Não</span><strong>${mx.btts_nao.toFixed(2)}</strong></button></div></div></div>`;}else{extraHtml=`<div style="margin-top:14px;padding:12px 14px;background:var(--verde-50);border-radius:var(--raio-xs);border:1px dashed var(--linha-forte);font-size:12px;color:var(--texto-sec);font-weight:700;text-align:center">${ESPORTE_EMOJI[esporte]} Mercado simplificado — apenas vitória casa/fora.</div>`;}return`<div class="${classes.join(' ')}"><div class="evento-top"><span class="liga-badge esporte-${esporte}"><span class="sport-emoji">${ESPORTE_EMOJI[esporte]}</span>${escapar(ev.liga)}</span><span class="hora">${escapar(rotuloHora(ev.inicio))}</span></div><div class="evento-times"><div class="time">${escapar(ev.casa)}</div><div class="vs">VS</div><div class="time dir">${escapar(ev.fora)}</div></div><div class="placar-live" data-live="${ev.id}">${renderPill(est)}</div><div data-resultado="${ev.id}">${renderResultado(ev)}</div><div class="odds"><div class="odd-wrap"><button class="odd" type="button" tabindex="-1"><small>1</small><strong data-odd-casa="${ev.id}" class="${clsCasa}">${odds.oddCasa.toFixed(2)}</strong></button><button class="odd-add" type="button" data-add-evento="${ev.id}" data-add-lado="casa" ${terminado?'disabled':''}>${selCasa?'✓':'+'}</button></div><div class="odd-wrap"><button class="odd" type="button" tabindex="-1"><small>2</small><strong data-odd-fora="${ev.id}" class="${clsFora}">${odds.oddFora.toFixed(2)}</strong></button><button class="odd-add" type="button" data-add-evento="${ev.id}" data-add-lado="fora" ${terminado?'disabled':''}>${selFora?'✓':'+'}</button></div></div>${extraHtml}</div>`;}).join('');alvo.querySelectorAll('.odd-add[data-add-evento]').forEach(b=>{b.addEventListener('click',()=>{const id=Number(b.dataset.addEvento);const lado=b.dataset.addLado;const ev=obterEventos().find(e=>e.id===id);if(!ev)return;if(estadoJogo(ev).fase==='terminado'){toast('Evento terminado.','erro');return;}const odds=oddsDinamicas(ev);const odd=lado==='casa'?odds.oddCasa:odds.oddFora;const equipa=lado==='casa'?ev.casa:ev.fora;toggleSelecao({eventoId:id,mercado:'1x2',lado,equipa,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga,esporte:ev.esporte||'futebol'});renderizarMercado();});});alvo.querySelectorAll('[data-toggle-extra]').forEach(b=>{b.addEventListener('click',()=>{toggleExpansao(Number(b.dataset.toggleExtra));renderizarMercado();});});alvo.querySelectorAll('[data-extra]').forEach(b=>{b.addEventListener('click',()=>{const evId=Number(b.dataset.evid);const ev=obterEventos().find(e=>e.id===evId);if(!ev)return;if(estadoJogo(ev).fase==='terminado'){toast('Evento terminado.','erro');return;}const mercado=b.dataset.extra;const mx=oddsMercadosExtra(ev);if(mercado==='empate'){toggleSelecao({eventoId:evId,mercado:'empate',lado:'empate',equipa:'Empate',odd:mx.empate,casa:ev.casa,fora:ev.fora,liga:ev.liga});}else if(mercado==='dupla'){const dupla=b.dataset.dupla;let odd;if(dupla==='1X')odd=mx.dupla1X;else if(dupla==='12')odd=mx.dupla12;else odd=mx.duplaX2;toggleSelecao({eventoId:evId,mercado:'dupla',dupla,lado:'dupla-'+dupla,equipa:'Dupla '+dupla,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga});}else if(mercado==='ht'){const ht=b.dataset.ht;let odd,equipa;if(ht==='1'){odd=mx.ht1;equipa=ev.casa+' (1ª parte)';}else if(ht==='X'){odd=mx.htX;equipa='Empate (1ª parte)';}else{odd=mx.ht2;equipa=ev.fora+' (1ª parte)';}toggleSelecao({eventoId:evId,mercado:'ht',ht,lado:'ht-'+ht,equipa,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga});}else if(mercado==='total_golos'){const lado=b.dataset.lado,linha=Number(b.dataset.linha);const odd=lado==='over'?mx['total_'+linha]:mx['total_menos_'+linha];const equipa=(lado==='over'?'Mais':'Menos')+' de '+linha+' golos (90\')';toggleSelecao({eventoId:evId,mercado:'total_golos',submercado:lado,linha,equipa,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga});}else if(mercado==='btts'){const sim=b.dataset.sim==='1';const odd=sim?mx.btts_sim:mx.btts_nao;const equipa='Ambas marcam: '+(sim?'Sim':'Não');toggleSelecao({eventoId:evId,mercado:'btts',sim,equipa,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga});}renderizarMercado();});});atualizarRelogios();}
+/* Helper UI: gera bloco Over/Under para um conjunto de chaves */
+function renderOUGrupo(evId,mx,keyOver,keyUnder,terminado){
+  const over=[0,1,2,3,4,5].map(n=>`<button class="opcao-odd" type="button" data-extra-ou="1" data-lado="over" data-linha="${n}" data-evid="${evId}" ${terminado?'disabled':''}><span>+ ${n}</span><strong>${(mx[keyOver+n]||1.10).toFixed(2)}</strong></button>`).join('');
+  const under=[1,2,3,4,5].map(n=>`<button class="opcao-odd" type="button" data-extra-ou="1" data-lado="under" data-linha="${n}" data-evid="${evId}" ${terminado?'disabled':''}><span>- ${n}</span><strong>${(mx[keyUnder+n]||1.10).toFixed(2)}</strong></button>`).join('');
+  return `<div class="ou-grelha"><div><div class="ou-col-titulo over">Mais de</div><div class="ou-lista">${over}</div></div><div><div class="ou-col-titulo under">Menos de</div><div class="ou-lista">${under}</div></div></div>`;
+}
+
+function renderizarMercado(){
+  const alvo=$('#listaEventos');
+  if(!alvo)return;
+  const todos=obterEventos().filter(ev=>!eventoExpirado(ev));
+  atualizarContadoresFiltro();
+  const eventos=FILTRO_ESPORTE==='todos'?todos:todos.filter(ev=>(ev.esporte||'futebol')===FILTRO_ESPORTE);
+  if(!eventos.length){
+    alvo.innerHTML=`<div class="vazio">${FILTRO_ESPORTE==='todos'?'Ainda não existem eventos disponíveis no mercado.<br><b>Aguarde a actualização de jogos em tempo real.</b>':`Não há jogos de <b>${ESPORTE_NOME[FILTRO_ESPORTE]}</b> de momento.`}</div>`;
+    return;
+  }
+  const boletim=obterBoletim();
+  alvo.innerHTML=eventos.map(ev=>{
+    const esporte=ev.esporte||'futebol';
+    const est=estadoJogo(ev);
+    const odds=oddsDinamicas(ev);
+    const terminado=est.fase==='terminado';
+    const classes=['evento','esporte-'+esporte];
+    if(est.live)classes.push('ao-vivo');
+    if(terminado)classes.push('terminado');
+    const isFutebol=esporte==='futebol';
+    const selCasa=boletim.find(s=>s.eventoId===ev.id&&(s.mercado||'1x2')==='1x2'&&s.lado==='casa');
+    const selFora=boletim.find(s=>s.eventoId===ev.id&&(s.mercado||'1x2')==='1x2'&&s.lado==='fora');
+    const clsCasa=classeOdd(odds.oddCasa,Number(ev.oddCasa));
+    const clsFora=classeOdd(odds.oddFora,Number(ev.oddFora));
+    let extraHtml='';
+    if(isFutebol){
+      const mx=oddsMercadosExtra(ev);
+      const aberto=EXPANDIDOS.has(ev.id);
+      const selEmpate=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='empate');
+      const selD1X=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='dupla'&&s.dupla==='1X');
+      const selD12=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='dupla'&&s.dupla==='12');
+      const selDX2=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='dupla'&&s.dupla==='X2');
+      const selHt1=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='ht'&&s.ht==='1');
+      const selHtX=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='ht'&&s.ht==='X');
+      const selHt2=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='ht'&&s.ht==='2');
+      const selHtBttsS=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='ht_btts'&&s.sim===true);
+      const selHtBttsN=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='ht_btts'&&s.sim===false);
+      const selSt1=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='st_1x2'&&s.lado==='casa');
+      const selStX=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='st_1x2'&&s.lado==='empate');
+      const selSt2=boletim.some(s=>s.eventoId===ev.id&&s.mercado==='st_1x2'&&s.lado==='fora');
+      const disab=terminado?'disabled':'';
+
+      extraHtml=`
+      <button class="toggle-mercados ${aberto?'aberto':''}" type="button" data-toggle-extra="${ev.id}">${aberto?'▴ Ocultar mercados':'▾ Ver todos os mercados (mais de 100 opções)'}</button>
+      <div class="mercados-extra ${aberto?'':'hidden'}" data-extra-container="${ev.id}">
+
+        <div class="mercado-secao-titulo">⚽ Resultado Final (90')</div>
+        <div class="mercado-grelha">
+          <div class="mercado-bloco">
+            <span class="mercado-titulo-mini">Resultado Final (1X2)</span>
+            <div class="mercado-opcoes uma" style="margin-bottom:8px">
+              <button class="opcao-odd ${selEmpate?'selecionada':''}" type="button" data-extra="empate" data-evid="${ev.id}" ${disab}><span>Empate (X)</span><strong>${mx.empate.toFixed(2)}</strong></button>
+            </div>
+            <div class="mercado-opcoes">
+              <button class="opcao-odd ${selD1X?'selecionada':''}" type="button" data-extra="dupla" data-dupla="1X" data-evid="${ev.id}" ${disab}><span>1X</span><strong>${mx.dupla1X.toFixed(2)}</strong></button>
+              <button class="opcao-odd ${selD12?'selecionada':''}" type="button" data-extra="dupla" data-dupla="12" data-evid="${ev.id}" ${disab}><span>12</span><strong>${mx.dupla12.toFixed(2)}</strong></button>
+              <button class="opcao-odd ${selDX2?'selecionada':''}" type="button" data-extra="dupla" data-dupla="X2" data-evid="${ev.id}" ${disab}><span>X2</span><strong>${mx.duplaX2.toFixed(2)}</strong></button>
+            </div>
+          </div>
+          <div class="mercado-bloco">
+            <span class="mercado-titulo-mini">Ambas Marcam (90')</span>
+            <div class="mercado-opcoes duas">
+              <button class="opcao-odd" type="button" data-extra="btts" data-sim="1" data-evid="${ev.id}" ${disab}><span>Sim</span><strong>${mx.btts_sim.toFixed(2)}</strong></button>
+              <button class="opcao-odd" type="button" data-extra="btts" data-sim="0" data-evid="${ev.id}" ${disab}><span>Não</span><strong>${mx.btts_nao.toFixed(2)}</strong></button>
+            </div>
+          </div>
+        </div>
+
+        <div class="mercado-secao-titulo">📊 1ª Parte (45')</div>
+        <div class="mercado-grelha">
+          <div class="mercado-bloco">
+            <span class="mercado-titulo-mini">1ª Parte · Resultado (1X2)</span>
+            <div class="mercado-opcoes">
+              <button class="opcao-odd ${selHt1?'selecionada':''}" type="button" data-extra="ht" data-ht="1" data-evid="${ev.id}" ${disab}><span>1</span><strong>${mx.ht1.toFixed(2)}</strong></button>
+              <button class="opcao-odd ${selHtX?'selecionada':''}" type="button" data-extra="ht" data-ht="X" data-evid="${ev.id}" ${disab}><span>X</span><strong>${mx.htX.toFixed(2)}</strong></button>
+              <button class="opcao-odd ${selHt2?'selecionada':''}" type="button" data-extra="ht" data-ht="2" data-evid="${ev.id}" ${disab}><span>2</span><strong>${mx.ht2.toFixed(2)}</strong></button>
+            </div>
+          </div>
+          <div class="mercado-bloco">
+            <span class="mercado-titulo-mini">1ª Parte · Ambas Marcam</span>
+            <div class="mercado-opcoes duas">
+              <button class="opcao-odd ${selHtBttsS?'selecionada':''}" type="button" data-extra="ht_btts" data-sim="1" data-evid="${ev.id}" ${disab}><span>Sim</span><strong>${mx.ht_btts_sim.toFixed(2)}</strong></button>
+              <button class="opcao-odd ${selHtBttsN?'selecionada':''}" type="button" data-extra="ht_btts" data-sim="0" data-evid="${ev.id}" ${disab}><span>Não</span><strong>${mx.ht_btts_nao.toFixed(2)}</strong></button>
+            </div>
+          </div>
+          <div class="mercado-bloco" style="grid-column:1/-1">
+            <span class="mercado-titulo-mini">1ª Parte · Total de Golos (45')</span>
+            ${renderOUGrupo(ev.id,mx,'ht_total_','ht_menos_',terminado)}
+          </div>
+          <div class="mercado-bloco" style="grid-column:1/-1">
+            <span class="mercado-titulo-mini">1ª Parte · Golos ${escapar(ev.casa)}</span>
+            ${renderOUGrupo(ev.id,mx,'ht_casa_','ht_casa_menos_',terminado)}
+          </div>
+          <div class="mercado-bloco" style="grid-column:1/-1">
+            <span class="mercado-titulo-mini">1ª Parte · Golos ${escapar(ev.fora)}</span>
+            ${renderOUGrupo(ev.id,mx,'ht_fora_','ht_fora_menos_',terminado)}
+          </div>
+        </div>
+
+        <div class="mercado-secao-titulo">🔚 2ª Parte (45')</div>
+        <div class="mercado-grelha">
+          <div class="mercado-bloco" style="grid-column:1/-1">
+            <span class="mercado-titulo-mini">2ª Parte · Resultado (1X2)</span>
+            <div class="mercado-opcoes">
+              <button class="opcao-odd ${selSt1?'selecionada':''}" type="button" data-extra="st_1x2" data-lado="casa" data-evid="${ev.id}" ${disab}><span>${escapar(ev.casa)}</span><strong>${mx.st_1.toFixed(2)}</strong></button>
+              <button class="opcao-odd ${selStX?'selecionada':''}" type="button" data-extra="st_1x2" data-lado="empate" data-evid="${ev.id}" ${disab}><span>Empate</span><strong>${mx.st_X.toFixed(2)}</strong></button>
+              <button class="opcao-odd ${selSt2?'selecionada':''}" type="button" data-extra="st_1x2" data-lado="fora" data-evid="${ev.id}" ${disab}><span>${escapar(ev.fora)}</span><strong>${mx.st_2.toFixed(2)}</strong></button>
+            </div>
+          </div>
+          <div class="mercado-bloco" style="grid-column:1/-1">
+            <span class="mercado-titulo-mini">2ª Parte · Total de Golos</span>
+            ${renderOUGrupo(ev.id,mx,'st_total_','st_menos_',terminado)}
+          </div>
+          <div class="mercado-bloco" style="grid-column:1/-1">
+            <span class="mercado-titulo-mini">2ª Parte · Golos ${escapar(ev.casa)}</span>
+            ${renderOUGrupo(ev.id,mx,'st_casa_','st_casa_menos_',terminado)}
+          </div>
+          <div class="mercado-bloco" style="grid-column:1/-1">
+            <span class="mercado-titulo-mini">2ª Parte · Golos ${escapar(ev.fora)}</span>
+            ${renderOUGrupo(ev.id,mx,'st_fora_','st_fora_menos_',terminado)}
+          </div>
+        </div>
+
+        <div class="mercado-secao-titulo">🎯 Total de Golos na Partida (90')</div>
+        <div class="mercado-grelha">
+          <div class="mercado-bloco" style="grid-column:1/-1">
+            <span class="mercado-titulo-mini">Total de Golos (90')</span>
+            ${renderOUGrupo(ev.id,mx,'total_','total_menos_',terminado)}
+          </div>
+        </div>
+
+      </div>`;
+    } else {
+      extraHtml=`<div style="margin-top:14px;padding:12px 14px;background:var(--verde-50);border-radius:var(--raio-xs);border:1px dashed var(--linha-forte);font-size:12px;color:var(--texto-sec);font-weight:700;text-align:center">${ESPORTE_EMOJI[esporte]} Mercado simplificado — apenas vitória casa/fora.</div>`;
+    }
+    return`<div class="${classes.join(' ')}"><div class="evento-top"><span class="liga-badge esporte-${esporte}"><span class="sport-emoji">${ESPORTE_EMOJI[esporte]}</span>${escapar(ev.liga)}</span><span class="hora">${escapar(rotuloHora(ev.inicio))}</span></div><div class="evento-times"><div class="time">${escapar(ev.casa)}</div><div class="vs">VS</div><div class="time dir">${escapar(ev.fora)}</div></div><div class="placar-live" data-live="${ev.id}">${renderPill(est)}</div><div data-resultado="${ev.id}">${renderResultado(ev)}</div><div class="odds"><div class="odd-wrap"><button class="odd" type="button" tabindex="-1"><small>1</small><strong data-odd-casa="${ev.id}" class="${clsCasa}">${odds.oddCasa.toFixed(2)}</strong></button><button class="odd-add" type="button" data-add-evento="${ev.id}" data-add-lado="casa" ${terminado?'disabled':''}>${selCasa?'✓':'+'}</button></div><div class="odd-wrap"><button class="odd" type="button" tabindex="-1"><small>2</small><strong data-odd-fora="${ev.id}" class="${clsFora}">${odds.oddFora.toFixed(2)}</strong></button><button class="odd-add" type="button" data-add-evento="${ev.id}" data-add-lado="fora" ${terminado?'disabled':''}>${selFora?'✓':'+'}</button></div></div>${extraHtml}</div>`;
+  }).join('');
+
+  // Listeners — 1X2
+  alvo.querySelectorAll('.odd-add[data-add-evento]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const id=Number(b.dataset.addEvento);
+      const lado=b.dataset.addLado;
+      const ev=obterEventos().find(e=>e.id===id);
+      if(!ev)return;
+      if(estadoJogo(ev).fase==='terminado'){toast('Evento terminado.','erro');return;}
+      const odds=oddsDinamicas(ev);
+      const odd=lado==='casa'?odds.oddCasa:odds.oddFora;
+      const equipa=lado==='casa'?ev.casa:ev.fora;
+      toggleSelecao({eventoId:id,mercado:'1x2',lado,equipa,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga,esporte:ev.esporte||'futebol'});
+      renderizarMercado();
+    });
+  });
+
+  // Listeners — toggle mercados
+  alvo.querySelectorAll('[data-toggle-extra]').forEach(b=>{
+    b.addEventListener('click',()=>{toggleExpansao(Number(b.dataset.toggleExtra));renderizarMercado();});
+  });
+
+  // Listeners — mercados extra (não O/U)
+  alvo.querySelectorAll('[data-extra]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const evId=Number(b.dataset.evid);
+      const ev=obterEventos().find(e=>e.id===evId);
+      if(!ev)return;
+      if(estadoJogo(ev).fase==='terminado'){toast('Evento terminado.','erro');return;}
+      const mercado=b.dataset.extra;
+      const mx=oddsMercadosExtra(ev);
+      if(mercado==='empate'){
+        toggleSelecao({eventoId:evId,mercado:'empate',lado:'empate',equipa:'Empate (90\')',odd:mx.empate,casa:ev.casa,fora:ev.fora,liga:ev.liga});
+      } else if(mercado==='dupla'){
+        const dupla=b.dataset.dupla;let odd;
+        if(dupla==='1X')odd=mx.dupla1X;else if(dupla==='12')odd=mx.dupla12;else odd=mx.duplaX2;
+        toggleSelecao({eventoId:evId,mercado:'dupla',dupla,lado:'dupla-'+dupla,equipa:'Dupla '+dupla,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga});
+      } else if(mercado==='ht'){
+        const ht=b.dataset.ht;let odd,equipa;
+        if(ht==='1'){odd=mx.ht1;equipa=ev.casa+' (1ª parte)';}
+        else if(ht==='X'){odd=mx.htX;equipa='Empate (1ª parte)';}
+        else{odd=mx.ht2;equipa=ev.fora+' (1ª parte)';}
+        toggleSelecao({eventoId:evId,mercado:'ht',ht,lado:'ht-'+ht,equipa,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga});
+      } else if(mercado==='btts'){
+        const sim=b.dataset.sim==='1';
+        const odd=sim?mx.btts_sim:mx.btts_nao;
+        const equipa='Ambas marcam (90\'): '+(sim?'Sim':'Não');
+        toggleSelecao({eventoId:evId,mercado:'btts',sim,equipa,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga});
+      } else if(mercado==='ht_btts'){
+        const sim=b.dataset.sim==='1';
+        const odd=sim?mx.ht_btts_sim:mx.ht_btts_nao;
+        const equipa='1ªP ambas marcam: '+(sim?'Sim':'Não');
+        toggleSelecao({eventoId:evId,mercado:'ht_btts',sim,equipa,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga});
+      } else if(mercado==='st_1x2'){
+        const lado=b.dataset.lado;let odd,equipa;
+        if(lado==='casa'){odd=mx.st_1;equipa=ev.casa+' (2ª parte)';}
+        else if(lado==='empate'){odd=mx.st_X;equipa='Empate (2ª parte)';}
+        else{odd=mx.st_2;equipa=ev.fora+' (2ª parte)';}
+        toggleSelecao({eventoId:evId,mercado:'st_1x2',lado,equipa,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga});
+      }
+      renderizarMercado();
+    });
+  });
+
+  // Listeners — O/U grupos (novos e os antigos do 90')
+  alvo.querySelectorAll('[data-extra-ou]').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const evId=Number(b.dataset.evid);
+      const ev=obterEventos().find(e=>e.id===evId);
+      if(!ev)return;
+      if(estadoJogo(ev).fase==='terminado'){toast('Evento terminado.','erro');return;}
+      const lado=b.dataset.lado;
+      const linha=Number(b.dataset.linha);
+      const tipoOU=b.dataset.ouTipo || '';
+      // Descobrir a que mercado pertence através do container
+      const bloco=b.closest('.mercado-bloco');
+      const titulo=bloco?bloco.querySelector('.mercado-titulo-mini')?.textContent||'':'';
+      let mercado='total_golos';
+      let equipa='';
+      if(titulo.includes('1ª Parte · Total')){mercado='ht_total_golos';equipa=(lado==='over'?'1ªP mais':'1ªP menos')+' de '+linha+' golos';}
+      else if(titulo.includes(`1ª Parte · Golos ${ev.casa}`)||titulo.includes('1ª Parte · Golos '+ev.casa)){mercado='ht_golos_casa';equipa=(lado==='over'?'1ªP casa mais':'1ªP casa menos')+' de '+linha+' golos';}
+      else if(titulo.includes('1ª Parte · Golos')){mercado='ht_golos_fora';equipa=(lado==='over'?'1ªP fora mais':'1ªP fora menos')+' de '+linha+' golos';}
+      else if(titulo.includes('2ª Parte · Total')){mercado='st_total_golos';equipa=(lado==='over'?'2ªP mais':'2ªP menos')+' de '+linha+' golos';}
+      else if(titulo.includes('2ª Parte · Golos '+ev.casa)||titulo.includes(`2ª Parte · Golos ${ev.casa}`)){mercado='st_golos_casa';equipa=(lado==='over'?'2ªP casa mais':'2ªP casa menos')+' de '+linha+' golos';}
+      else if(titulo.includes('2ª Parte · Golos')){mercado='st_golos_fora';equipa=(lado==='over'?'2ªP fora mais':'2ªP fora menos')+' de '+linha+' golos';}
+      else if(titulo.includes('Total de Golos')){mercado='total_golos';equipa=(lado==='over'?'Mais':'Menos')+' de '+linha+' golos (90\')';}
+      const mx=oddsMercadosExtra(ev);
+      let odd=1.10;
+      const keyOver=(mercado==='ht_total_golos')?'ht_total_':(mercado==='ht_golos_casa')?'ht_casa_':(mercado==='ht_golos_fora')?'ht_fora_':(mercado==='st_total_golos')?'st_total_':(mercado==='st_golos_casa')?'st_casa_':(mercado==='st_golos_fora')?'st_fora_':'total_';
+      const keyUnder=(mercado==='ht_total_golos')?'ht_menos_':(mercado==='ht_golos_casa')?'ht_casa_menos_':(mercado==='ht_golos_fora')?'ht_fora_menos_':(mercado==='st_total_golos')?'st_menos_':(mercado==='st_golos_casa')?'st_casa_menos_':(mercado==='st_golos_fora')?'st_fora_menos_':'total_menos_';
+      if(lado==='over')odd=mx[keyOver+linha]||1.10;else odd=mx[keyUnder+linha]||1.10;
+      toggleSelecao({eventoId:evId,mercado,submercado:lado,linha,equipa,odd,casa:ev.casa,fora:ev.fora,liga:ev.liga});
+      renderizarMercado();
+    });
+  });
+
+  atualizarRelogios();
+}
 
 function renderizarApostas(){const alvo=$('#listaApostas');const u=utilizadorAtual();if(!alvo||!u)return;const apostas=(u.apostas||[]).slice().sort((a,b)=>new Date(b.data)-new Date(a.data));const ativas=apostas.filter(a=>a.estado==='ativa');const liquidadas=apostas.filter(a=>a.estado!=='ativa');const totalEmJogo=ativas.reduce((s,a)=>s+Number(a.valor||0),0);const totalApostado=apostas.reduce((s,a)=>s+Number(a.valor||0),0);let html=`<div class="apostas-resumo"><div><small>Activas</small><strong>${ativas.length}</strong></div><div><small>Em jogo</small><strong>${kz(totalEmJogo)}</strong></div><div><small>Total apostado</small><strong>${kz(totalApostado)}</strong></div></div>`;html+=`<div class="grupo-titulo">Apostas activas (${ativas.length})</div>`;html+=ativas.length?ativas.map(cartaoAposta).join(''):`<div class="vazio">Ainda não tem apostas activas.<br>Vá ao <b>Mercado</b> e faça a sua primeira aposta.</div>`;html+=`<div class="grupo-titulo">Histórico (${liquidadas.length})</div>`;html+=liquidadas.length?liquidadas.map(cartaoAposta).join(''):`<div class="vazio">Ainda não existem apostas liquidadas.</div>`;alvo.innerHTML=html;}
 function cartaoAposta(a){if(Array.isArray(a.selecoes))return cartaoMultipla(a);return cartaoSimples(a);}
@@ -1726,7 +2159,35 @@ function cartaoSimples(a){const ev=obterEventos().find(e=>e.id===a.eventoId);con
 function cartaoMultipla(a){const rotulo={ativa:{txt:'Em jogo',cls:'ativa'},ganha:{txt:'Ganha',cls:'ganha'},perdida:{txt:'Perdida',cls:'perdida'},devolvida:{txt:'Devolvida',cls:'devolvida'}}[a.estado]||{txt:a.estado,cls:'ativa'};const oddTotal=Number(a.oddTotal||a.selecoes.reduce((p,s)=>p*Number(s.odd),1));const retornoPotencial=Number(a.valor)*oddTotal;const valorMostrar=(a.estado==='ativa')?retornoPotencial:Number(a.premio||0);const etiquetaRetorno=(a.estado==='ativa')?'Retorno potencial':'Prémio creditado';const selecoesHtml=a.selecoes.map(s=>{const sev=obterEventos().find(e=>e.id===s.eventoId);const sest=sev?estadoJogo(sev):null;let inlineHtml='';if(a.estado!=='ativa'&&sev&&sest&&sest.fase==='terminado'){const f=golosFinais(sev);inlineHtml=`<span class="ms-resultado">${f.casa}–${f.fora}</span>`;}else if(a.estado==='ativa'&&sest){let classesBadge='ms-live-badge';if(sest.fase==='primeira'||sest.fase==='segunda')classesBadge+=' ao-vivo';else if(sest.fase==='intervalo')classesBadge+=' intervalo';const dot=(sest.fase==='primeira'||sest.fase==='segunda')?'<span class="live-dot"></span>':'';inlineHtml=`<span class="${classesBadge}" data-live-bet="${s.eventoId}">${dot}<span>${escapar(sest.texto)}</span></span>`;}return`<div class="multipla-sel"><span class="ms-equipa">${escapar(s.equipa)}</span><span class="ms-jogo">${escapar(s.casa)} vs ${escapar(s.fora)}</span>${inlineHtml}<span class="ms-odd">${Number(s.odd).toFixed(2)}</span></div>`;}).join('');return`<div class="aposta-card ${a.estado}"><div class="aposta-top"><div><strong>🎫 Aposta múltipla · ${a.selecoes.length} selecções</strong><small>${dataCurta(a.data)}</small></div><span class="pill ${rotulo.cls}">${rotulo.txt}</span></div><div class="multipla-selecoes">${selecoesHtml}</div><div class="aposta-info"><div class="info-bloco">Valor: <b>${kz(a.valor)}</b></div><div class="info-bloco">Odd total: <b>${oddTotal.toFixed(2)}</b></div><div class="info-bloco">${etiquetaRetorno}: <b>${kz(valorMostrar)}</b></div></div></div>`;}
 
 /* LIQUIDAÇÃO */
-function resultadoSelecao(s,ev){const f=golosFinais(ev);const total=f.casa+f.fora;const m=s.mercado||'1x2';const isFutebol=(ev.esporte||'futebol')==='futebol';if(m==='1x2'){if(s.lado==='casa')return f.casa>f.fora?'ganha':'perdida';return f.fora>f.casa?'ganha':'perdida';}if(!isFutebol)return'perdida';if(m==='empate')return f.casa===f.fora?'ganha':'perdida';if(m==='dupla'){if(s.dupla==='1X')return f.casa>=f.fora?'ganha':'perdida';if(s.dupla==='12')return f.casa!==f.fora?'ganha':'perdida';if(s.dupla==='X2')return f.fora>=f.casa?'ganha':'perdida';return'perdida';}if(m==='ht'){const ht=contagemGolos(ev,45);if(s.ht==='1')return ht.casa>ht.fora?'ganha':'perdida';if(s.ht==='X')return ht.casa===ht.fora?'ganha':'perdida';if(s.ht==='2')return ht.fora>ht.casa?'ganha':'perdida';}if(m==='total_golos'){if(s.submercado==='over')return total>s.linha?'ganha':'perdida';return total<s.linha?'ganha':'perdida';}if(m==='btts'){const ambas=f.casa>0&&f.fora>0;return s.sim?(ambas?'ganha':'perdida'):(ambas?'perdida':'ganha');}return'perdida';}
+function resultadoSelecao(s,ev){
+  const f=golosFinais(ev);
+  const total=f.casa+f.fora;
+  const ht=contagemGolos(ev,45);
+  const g2C=Math.max(0,f.casa-ht.casa);
+  const g2F=Math.max(0,f.fora-ht.fora);
+  const htTot=ht.casa+ht.fora;
+  const stTot=g2C+g2F;
+  const m=s.mercado||'1x2';
+  const isFutebol=(ev.esporte||'futebol')==='futebol';
+  if(m==='1x2'){if(s.lado==='casa')return f.casa>f.fora?'ganha':'perdida';return f.fora>f.casa?'ganha':'perdida';}
+  if(!isFutebol)return'perdida';
+  if(m==='empate')return f.casa===f.fora?'ganha':'perdida';
+  if(m==='dupla'){if(s.dupla==='1X')return f.casa>=f.fora?'ganha':'perdida';if(s.dupla==='12')return f.casa!==f.fora?'ganha':'perdida';if(s.dupla==='X2')return f.fora>=f.casa?'ganha':'perdida';return'perdida';}
+  if(m==='ht'){if(s.ht==='1')return ht.casa>ht.fora?'ganha':'perdida';if(s.ht==='X')return ht.casa===ht.fora?'ganha':'perdida';if(s.ht==='2')return ht.fora>ht.casa?'ganha':'perdida';}
+  if(m==='total_golos'){if(s.submercado==='over')return total>s.linha?'ganha':'perdida';return total<s.linha?'ganha':'perdida';}
+  if(m==='total_golos_casa'){const g=f.casa;if(s.submercado==='over')return g>s.linha?'ganha':'perdida';return g<s.linha?'ganha':'perdida';}
+  if(m==='total_golos_fora'){const g=f.fora;if(s.submercado==='over')return g>s.linha?'ganha':'perdida';return g<s.linha?'ganha':'perdida';}
+  if(m==='btts'){const ambas=f.casa>0&&f.fora>0;return s.sim?(ambas?'ganha':'perdida'):(ambas?'perdida':'ganha');}
+  if(m==='ht_golos'){if(s.submercado==='over')return htTot>s.linha?'ganha':'perdida';return htTot<s.linha?'ganha':'perdida';}
+  if(m==='ht_golos_casa'){if(s.submercado==='over')return ht.casa>s.linha?'ganha':'perdida';return ht.casa<s.linha?'ganha':'perdida';}
+  if(m==='ht_golos_fora'){if(s.submercado==='over')return ht.fora>s.linha?'ganha':'perdida';return ht.fora<s.linha?'ganha':'perdida';}
+  if(m==='ht_btts'){const ambas=ht.casa>0&&ht.fora>0;return s.sim?(ambas?'ganha':'perdida'):(ambas?'perdida':'ganha');}
+  if(m==='st_1x2'){if(s.lado==='casa')return g2C>g2F?'ganha':'perdida';if(s.lado==='empate')return g2C===g2F?'ganha':'perdida';return g2F>g2C?'ganha':'perdida';}
+  if(m==='st_total_golos'){if(s.submercado==='over')return stTot>s.linha?'ganha':'perdida';return stTot<s.linha?'ganha':'perdida';}
+  if(m==='st_golos_casa'){if(s.submercado==='over')return g2C>s.linha?'ganha':'perdida';return g2C<s.linha?'ganha':'perdida';}
+  if(m==='st_golos_fora'){if(s.submercado==='over')return g2F>s.linha?'ganha':'perdida';return g2F<s.linha?'ganha':'perdida';}
+  return'perdida';
+}
 let liquidacaoTimeouts={};
 function agendarLiquidacaoExata(ev){if(!ev||!ev.id)return;const id=ev.id;if(liquidacaoTimeouts[id]){clearTimeout(liquidacaoTimeouts[id]);delete liquidacaoTimeouts[id];}const inicioMs=new Date(ev.inicio).getTime();if(isNaN(inicioMs))return;const fimMs=inicioMs+FIM_JOGO*60000;const agora=Date.now();if(fimMs<=agora)return;const delay=Math.max(0,fimMs-agora+200);liquidacaoTimeouts[id]=setTimeout(()=>{delete liquidacaoTimeouts[id];liquidarApostas();},delay);}
 function agendarTodasLiquidacoes(){const eventos=obterEventos();const idsAtuais=new Set(eventos.map(e=>e.id));Object.keys(liquidacaoTimeouts).forEach(id=>{if(!idsAtuais.has(Number(id))){clearTimeout(liquidacaoTimeouts[id]);delete liquidacaoTimeouts[id];}});eventos.forEach(agendarLiquidacaoExata);}
@@ -1800,12 +2261,11 @@ let toastTimer;
 function toast(msg,tipo='ok'){const el=$('#toast');el.textContent=msg;el.className='toast show'+(tipo==='erro'?' erro':(tipo==='ganho'?' ganho':''));clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),5000);}
 
 /* ══════════════════════════════════════════════════════════════
-   ARRANQUE — Carrega do Firebase primeiro, depois inicia UI
+   ARRANQUE
    ══════════════════════════════════════════════════════════════ */
 (async function iniciar(){
   atualizarStatusFirebase('loading','A ligar…');
 
-  /* 1) Carrega tudo do Firebase (se disponível) antes de renderizar */
   if (fbDb) {
     try {
       await carregarTudoDoFirebase();
@@ -1821,10 +2281,8 @@ function toast(msg,tipo='ok'){const el=$('#toast');el.textContent=msg;el.classNa
     atualizarStatusFirebase('offline','Offline');
   }
 
-  /* 2) Listeners em tempo real */
   if (fbReady) ativarListenersFirebase();
 
-  /* 3) Arranque normal (igual ao original) */
   const sessao = sessaoAtual();
   obterEventos();
   obterUtilizadores();
