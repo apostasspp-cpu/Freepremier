@@ -117,7 +117,12 @@ input,select,textarea{font:inherit}
 .balance-sub{display:flex;gap:32px;margin:20px 0 24px;flex-wrap:wrap}
 .balance-sub div small{display:block;font-size:11.5px;color:var(--cinza);margin-bottom:4px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
 .balance-sub div strong{font-size:16px;font-weight:900;color:var(--verde-800);font-variant-numeric:tabular-nums}
+.balance-sub div strong.bonus{color:#8D6E00}
 .balance-actions{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bonus-lock-box{display:none;margin-top:16px;background:linear-gradient(135deg, rgba(255,179,0,.1), rgba(255,109,0,.05));border:1.5px solid rgba(255,179,0,.35);border-left:4px solid #FFB300;border-radius:var(--raio-sm);padding:14px 16px;font-size:12.5px;line-height:1.6;color:#5D4300}
+.bonus-lock-box.show{display:flex;gap:12px;align-items:flex-start}
+.bonus-lock-box .bl-ico{font-size:20px;line-height:1;flex-shrink:0}
+.bonus-lock-box b{color:#3E2C00;font-weight:900}
 .sec-title{display:flex;justify-content:space-between;align-items:center;margin:28px 0 14px}
 .sec-title h2{font-size:17px;font-weight:900;letter-spacing:-.3px}
 .sec-title span{font-size:13px;color:var(--verde-600);font-weight:800;cursor:pointer;transition:.15s}
@@ -245,6 +250,7 @@ input,select,textarea{font:inherit}
 .linha:last-child{border-bottom:none}
 .linha span{color:var(--texto-sec);font-weight:600}
 .linha strong{font-weight:800;text-align:right}
+.linha strong.bonus{color:#8D6E00}
 .pedido{background:linear-gradient(180deg, #fff 0%, #F8FCF8 100%);border:1px solid var(--linha);border-radius:var(--raio-sm);padding:18px;margin-bottom:12px;box-shadow:var(--sombra-card);transition:.2s}
 .pedido:hover{box-shadow:0 8px 28px rgba(10,46,10,.1)}
 .pedido-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:16px}
@@ -726,7 +732,7 @@ input,select,textarea{font:inherit}
       <div class="field"><label for="regConfirma">Confirmar senha</label><div class="input"><input id="regConfirma" type="password" placeholder="Repita a senha" autocomplete="new-password"></div></div>
       <div class="field"><label for="regConvite">Código de convite ou de cadastro (opcional)</label><div class="input"><input id="regConvite" type="text" placeholder="Ex.: FPAB12CD ou CAD12345" autocomplete="off" spellcheck="false" maxlength="12" style="text-transform:uppercase;letter-spacing:2px;font-weight:800"></div></div>
       <p class="registo-dica">Se alguém o convidou com o código pessoal dele, o seu convidador ganhará <b><span id="tipBonusPercent">1</span>% de cada depósito aprovado</b> que fizer.</p>
-      <p class="registo-dica" style="color:#8D6E00">Bónus de boas-vindas: receba já <b><span id="tipWelcomeBonus">500,00 Kz</span></b> no seu saldo assim que criar a conta!</p>
+      <p class="registo-dica" style="color:#8D6E00">Bónus de boas-vindas: receba já <b><span id="tipWelcomeBonus">500,00 Kz</span></b> no seu saldo assim que criar a conta! <b>(o bónus só pode ser levantado após ser apostado)</b></p>
       <label class="check"><input type="checkbox" id="regTermos"><span>Confirmo que tenho mais de 18 anos e aceito os Termos de Uso e a Política de Privacidade da plataforma.</span></label>
       <button class="btn btn-primary" type="submit">Criar conta FREEPREMIER</button>
     </form>
@@ -763,10 +769,18 @@ input,select,textarea{font:inherit}
           <div><small>Em jogo</small><strong id="emJogoValor">0,00 Kz</strong></div>
           <div><small>Pendente</small><strong id="pendenteValor">0,00 Kz</strong></div>
           <div><small>Total em conta</small><strong id="totalValor">0,00 Kz</strong></div>
+          <div><small>Bónus disponível</small><strong id="bonusBloqueadoValor" class="bonus">0,00 Kz</strong></div>
+          <div><small>Disponível p/ levantar</small><strong id="disponivelLevantarValor">0,00 Kz</strong></div>
         </div>
         <div class="balance-actions">
           <button class="btn btn-primary" id="btnDepositar">Depositar e enviar comprovativo</button>
           <button class="btn btn-ghost" id="btnLevantar">Levantar</button>
+        </div>
+        <div class="bonus-lock-box" id="bonusLockBox">
+          <div class="bl-ico">🎁</div>
+          <div>
+            <b>Bónus bloqueado:</b> tem <b id="bonusLockValor">0,00 Kz</b> em bónus. Este valor <b>não pode ser levantado</b> enquanto não for apostado pelo menos uma vez.
+          </div>
         </div>
       </div>
 
@@ -859,6 +873,8 @@ input,select,textarea{font:inherit}
           <div class="linha"><span>Tipo de conta</span><strong>FREEPREMIER</strong></div>
           <div class="linha"><span>Membro desde</span><strong id="perfilCriado">—</strong></div>
           <div class="linha"><span>Saldo disponível</span><strong id="perfilSaldo">0,00 Kz</strong></div>
+          <div class="linha"><span>Bónus bloqueado</span><strong id="perfilBonusBloqueado" class="bonus">0,00 Kz</strong></div>
+          <div class="linha"><span>Disponível p/ levantar</span><strong id="perfilDisponivelLevantar">0,00 Kz</strong></div>
           <div class="linha"><span>Apostas activas</span><strong id="perfilApostasAtivas">0</strong></div>
           <div class="linha"><span>Total apostado</span><strong id="perfilTotalApostado">0,00 Kz</strong></div>
           <div class="linha" id="linhaConvidadoPor" style="display:none"><span>Convidado por</span><strong id="perfilConvidadoPor">—</strong></div>
@@ -868,7 +884,7 @@ input,select,textarea{font:inherit}
 
       <div class="convite-box" id="conviteBox">
         <h4>🎁 Código de convite <span class="estado-badge" id="conviteBadge">1%</span></h4>
-        <p class="sub">Partilhe o seu código pessoal. Sempre que alguém se registar com ele e fizer um depósito aprovado, recebe <b><span id="convitePercentDisplay">1</span>% do valor depositado</b>.</p>
+        <p class="sub">Partilhe o seu código pessoal. Sempre que alguém se registar com ele e fizer um depósito aprovado, recebe <b><span id="convitePercentDisplay">1</span>% do valor depositado</b> (o bónus fica bloqueado e só pode ser levantado após ser apostado).</p>
         <div class="codigo-display"><span class="codigo-valor" id="codigoConviteValor">— — — — — —</span><button class="codigo-copiar" id="btnCopiarCodigo" type="button">📋 Copiar</button></div>
         <button class="btn btn-primary" id="btnPartilharCodigo" type="button">📤 Partilhar código de convite</button>
         <div class="convite-stats">
@@ -1087,12 +1103,12 @@ input,select,textarea{font:inherit}
       <div class="mercado-head"><h2>Configurações FREEPREMIER</h2><p>Bónus de convite, boas-vindas e limites mínimos.</p></div>
       <div class="bloco-resultado" style="margin-top:20px">
         <h4>🎁 Bónus de convite <span class="tag">%</span></h4>
-        <p class="config-hint">Sempre que um utilizador convidado pelo código pessoal tiver um depósito aprovado, o convidador recebe esta percentagem do valor depositado.</p>
+        <p class="config-hint">Sempre que um utilizador convidado pelo código pessoal tiver um depósito aprovado, o convidador recebe esta percentagem do valor depositado. <b>Este bónus fica bloqueado e só pode ser levantado após ser apostado.</b></p>
         <div class="field"><label for="cfgBonusConvite">Percentagem do bónus (%)</label><div class="input"><input id="cfgBonusConvite" type="number" min="0" max="50" step="0.1" placeholder="1"></div></div>
       </div>
       <div class="bloco-resultado">
         <h4>🎉 Bónus de boas-vindas <span class="tag">Kz</span></h4>
-        <p class="config-hint">Valor creditado automaticamente ao criar conta.</p>
+        <p class="config-hint">Valor creditado automaticamente ao criar conta. <b>Fica bloqueado e só pode ser levantado após ser apostado.</b></p>
         <div class="field"><label for="cfgWelcomeBonus">Valor do bónus de boas-vindas (Kz)</label><div class="input"><input id="cfgWelcomeBonus" type="number" min="0" step="50" placeholder="500"></div></div>
       </div>
       <div class="bloco-resultado">
@@ -1177,6 +1193,7 @@ input,select,textarea{font:inherit}
 <script>
 /* ══════════════════════════════════════════════════════════════
    FREEPREMIER — Firebase Realtime Database + lógica original
+   (com bónus bloqueado até ser apostado)
    ══════════════════════════════════════════════════════════════ */
 
 const $  = (s, r = document) => r.querySelector(s);
@@ -1480,7 +1497,36 @@ const DEPOSITO_INFO_PADRAO = {iban:'',paypalEntidade:'',paypalReferencia:''};
 function obterDepositoInfo(){const info=ler(LS_DEPOSITO_INFO,null);if(!info||typeof info!=='object')return{...DEPOSITO_INFO_PADRAO};return{iban:typeof info.iban==='string'?info.iban:'',paypalEntidade:typeof info.paypalEntidade==='string'?info.paypalEntidade:'',paypalReferencia:typeof info.paypalReferencia==='string'?info.paypalReferencia:''};}
 function gravarDepositoInfo(info){gravar(LS_DEPOSITO_INFO,{iban:String(info.iban||'').trim(),paypalEntidade:String(info.paypalEntidade||'').trim(),paypalReferencia:String(info.paypalReferencia||'').trim()});}
 
-function garantirEstrutura(u){if(!u)return u;if(!Array.isArray(u.movimentos))u.movimentos=[];if(!Array.isArray(u.apostas))u.apostas=[];if(typeof u.emJogo!=='number'||isNaN(u.emJogo))u.emJogo=0;if(typeof u.saldo!=='number'||isNaN(u.saldo))u.saldo=0;if(typeof u.banco!=='string')u.banco='';if(typeof u.iban!=='string')u.iban='';if(typeof u.codigoConvite!=='string')u.codigoConvite='';if(!Array.isArray(u.convidados))u.convidados=[];if(typeof u.bonusConvite!=='number'||isNaN(u.bonusConvite))u.bonusConvite=0;if(typeof u.convidadoPor!=='string')u.convidadoPor='';if(typeof u.convidadoPorTel!=='string')u.convidadoPorTel='';if(typeof u.codigoRecuperacao!=='string')u.codigoRecuperacao='';if(typeof u.codigoCadastroSemBonus!=='string')u.codigoCadastroSemBonus='';if(typeof u.welcomeBonusRecebido!=='number'||isNaN(u.welcomeBonusRecebido))u.welcomeBonusRecebido=0;return u;}
+/* ══════════════════════════════════════════════════════════════
+   ⚠️ MUDANÇA PRINCIPAL — BÓNUS BLOQUEADO
+   Adicionamos "bonusSaldo" que representa quanto do saldo do
+   utilizador é bónus e ainda NÃO foi apostado (portanto, NÃO é
+   levantável). Sempre que o utilizador faz uma aposta, o valor
+   apostado reduz o bonusSaldo — assim que chega a 0, todo o saldo
+   passa a ser levantável.
+   ══════════════════════════════════════════════════════════════ */
+function garantirEstrutura(u){
+  if(!u)return u;
+  if(!Array.isArray(u.movimentos))u.movimentos=[];
+  if(!Array.isArray(u.apostas))u.apostas=[];
+  if(typeof u.emJogo!=='number'||isNaN(u.emJogo))u.emJogo=0;
+  if(typeof u.saldo!=='number'||isNaN(u.saldo))u.saldo=0;
+  if(typeof u.banco!=='string')u.banco='';
+  if(typeof u.iban!=='string')u.iban='';
+  if(typeof u.codigoConvite!=='string')u.codigoConvite='';
+  if(!Array.isArray(u.convidados))u.convidados=[];
+  if(typeof u.bonusConvite!=='number'||isNaN(u.bonusConvite))u.bonusConvite=0;
+  if(typeof u.convidadoPor!=='string')u.convidadoPor='';
+  if(typeof u.convidadoPorTel!=='string')u.convidadoPorTel='';
+  if(typeof u.codigoRecuperacao!=='string')u.codigoRecuperacao='';
+  if(typeof u.codigoCadastroSemBonus!=='string')u.codigoCadastroSemBonus='';
+  if(typeof u.welcomeBonusRecebido!=='number'||isNaN(u.welcomeBonusRecebido))u.welcomeBonusRecebido=0;
+  // ⚠️ Bónus bloqueado (não levantável até ser apostado)
+  if(typeof u.bonusSaldo!=='number'||isNaN(u.bonusSaldo))u.bonusSaldo=0;
+  if(u.bonusSaldo<0)u.bonusSaldo=0;
+  if(u.bonusSaldo>u.saldo)u.bonusSaldo=u.saldo;
+  return u;
+}
 
 const obterUtilizadores  = () => (ler(LS_USERS, []) || []).map(garantirEstrutura);
 const gravarUtilizadores = lista => gravar(LS_USERS, lista.map(garantirEstrutura));
@@ -1525,12 +1571,36 @@ function removerCodigoCadastro(codigo){gravarCodigosCadastro(obterCodigosCadastr
 function toggleAtivoCodigoCadastro(codigo){const lista=obterCodigosCadastro();const c=lista.find(x=>x.codigo===codigo);if(!c)return false;c.ativo=!c.ativo;gravarCodigosCadastro(lista);return c.ativo;}
 function encontrarCodigoCadastro(codigo){if(!codigo)return null;const norm=normalizarCodigoConvite(codigo);if(!norm)return null;return obterCodigosCadastro().find(c=>c.codigo===norm)||null;}
 function marcarCodigoCadastroUsado(codigo,user){const lista=obterCodigosCadastro();const c=lista.find(x=>x.codigo===codigo);if(!c)return;if(!Array.isArray(c.usados))c.usados=[];c.usados.push({telefone:user.telefone,nome:user.nome,data:new Date().toISOString()});gravarCodigosCadastro(lista);}
-function migrarCodigosConvite(){const users=obterUtilizadores();const usadosCod=new Set(users.map(u=>u.codigoConvite).filter(Boolean));const usadosRec=new Set(users.map(u=>u.codigoRecuperacao).filter(Boolean));let mudou=false;users.forEach(u=>{if(!u.codigoConvite){u.codigoConvite=gerarCodigoUnico(usadosCod);usadosCod.add(u.codigoConvite);mudou=true;}if(!u.codigoRecuperacao){u.codigoRecuperacao=gerarCodigoRecuperacaoUnico(usadosRec);usadosRec.add(u.codigoRecuperacao);mudou=true;}if(!Array.isArray(u.convidados)){u.convidados=[];mudou=true;}if(typeof u.bonusConvite!=='number'){u.bonusConvite=0;mudou=true;}if(typeof u.codigoCadastroSemBonus!=='string'){u.codigoCadastroSemBonus='';mudou=true;}if(!u.convidadoPorTel&&u.convidadoPor){const c=users.find(x=>x.codigoConvite===u.convidadoPor);if(c){u.convidadoPorTel=c.telefone;mudou=true;}}});if(mudou)gravarUtilizadores(users);return mudou;}
+function migrarCodigosConvite(){const users=obterUtilizadores();const usadosCod=new Set(users.map(u=>u.codigoConvite).filter(Boolean));const usadosRec=new Set(users.map(u=>u.codigoRecuperacao).filter(Boolean));let mudou=false;users.forEach(u=>{if(!u.codigoConvite){u.codigoConvite=gerarCodigoUnico(usadosCod);usadosCod.add(u.codigoConvite);mudou=true;}if(!u.codigoRecuperacao){u.codigoRecuperacao=gerarCodigoRecuperacaoUnico(usadosRec);usadosRec.add(u.codigoRecuperacao);mudou=true;}if(!Array.isArray(u.convidados)){u.convidados=[];mudou=true;}if(typeof u.bonusConvite!=='number'){u.bonusConvite=0;mudou=true;}if(typeof u.codigoCadastroSemBonus!=='string'){u.codigoCadastroSemBonus='';mudou=true;}if(typeof u.bonusSaldo!=='number'){u.bonusSaldo=0;mudou=true;}if(!u.convidadoPorTel&&u.convidadoPor){const c=users.find(x=>x.codigoConvite===u.convidadoPor);if(c){u.convidadoPorTel=c.telefone;mudou=true;}}});if(mudou)gravarUtilizadores(users);return mudou;}
 function normalizarCodigoConvite(v){return String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,12);}
 
-function creditarBonusConvitePorDepositoNaLista(lista,convidado,valorDeposito){if(!convidado||!convidado.convidadoPorTel)return null;const valor=Number(valorDeposito);if(!valor||valor<=0)return null;const cfg=obterConfig();const percent=Number(cfg.bonusConvite)||0;if(percent<=0)return null;const bonus=Math.round(valor*(percent/100)*100)/100;if(bonus<=0)return null;const convidador=lista.find(x=>x.telefone===convidado.convidadoPorTel);if(!convidador)return null;convidador.saldo=Number(convidador.saldo||0)+bonus;convidador.bonusConvite=Number(convidador.bonusConvite||0)+bonus;if(!Array.isArray(convidador.convidados))convidador.convidados=[];let entry=convidador.convidados.find(c=>c.telefone===convidado.telefone);if(entry){entry.bonus=Number(entry.bonus||0)+bonus;entry.ultimaAtividade=new Date().toISOString();}else{entry={nome:convidado.nome,telefone:convidado.telefone,data:new Date().toISOString(),bonus:bonus,ultimaAtividade:new Date().toISOString()};convidador.convidados.unshift(entry);}convidador.convidados=convidador.convidados.slice(0,60);convidador.movimentos=Array.isArray(convidador.movimentos)?convidador.movimentos:[];convidador.movimentos.unshift({id:novoId(),descricao:`Bónus de convite (${percent}%) · depósito de ${convidado.nome.split(' ')[0]}`,valor:bonus,tipo:'entrada',estado:'aprovado',data:new Date().toISOString()});convidador.movimentos=convidador.movimentos.slice(0,40);return{convidador,bonus,percent};}
+/* ⚠️ Bónus de convite: agora também entra em "bonusSaldo" (bloqueado) */
+function creditarBonusConvitePorDepositoNaLista(lista,convidado,valorDeposito){
+  if(!convidado||!convidado.convidadoPorTel)return null;
+  const valor=Number(valorDeposito);
+  if(!valor||valor<=0)return null;
+  const cfg=obterConfig();
+  const percent=Number(cfg.bonusConvite)||0;
+  if(percent<=0)return null;
+  const bonus=Math.round(valor*(percent/100)*100)/100;
+  if(bonus<=0)return null;
+  const convidador=lista.find(x=>x.telefone===convidado.convidadoPorTel);
+  if(!convidador)return null;
+  convidador.saldo=Number(convidador.saldo||0)+bonus;
+  convidador.bonusSaldo=Number(convidador.bonusSaldo||0)+bonus; // ⚠️ bloqueado
+  convidador.bonusConvite=Number(convidador.bonusConvite||0)+bonus;
+  if(!Array.isArray(convidador.convidados))convidador.convidados=[];
+  let entry=convidador.convidados.find(c=>c.telefone===convidado.telefone);
+  if(entry){entry.bonus=Number(entry.bonus||0)+bonus;entry.ultimaAtividade=new Date().toISOString();}
+  else{entry={nome:convidado.nome,telefone:convidado.telefone,data:new Date().toISOString(),bonus:bonus,ultimaAtividade:new Date().toISOString()};convidador.convidados.unshift(entry);}
+  convidador.convidados=convidador.convidados.slice(0,60);
+  convidador.movimentos=Array.isArray(convidador.movimentos)?convidador.movimentos:[];
+  convidador.movimentos.unshift({id:novoId(),descricao:`Bónus de convite (${percent}%) · depósito de ${convidado.nome.split(' ')[0]}`,valor:bonus,tipo:'entrada',estado:'aprovado',data:new Date().toISOString(),bonus:true});
+  convidador.movimentos=convidador.movimentos.slice(0,40);
+  return{convidador,bonus,percent};
+}
 
-function ajustarSaldoUtilizador(tel,valor,tipo,descricao){const lista=obterUtilizadores();const u=lista.find(x=>x.telefone===tel);if(!u)return{ok:false,msg:'Utilizador não encontrado.'};const v=Number(valor);if(!v||v<=0)return{ok:false,msg:'Introduza um valor válido (> 0).'};if(tipo==='add'){u.saldo=Number(u.saldo||0)+v;u.movimentos=Array.isArray(u.movimentos)?u.movimentos:[];u.movimentos.unshift({id:novoId(),descricao:'💚 '+(descricao||'Crédito atribuído pelo administrador'),valor:v,tipo:'entrada',estado:'aprovado',data:new Date().toISOString()});u.movimentos=u.movimentos.slice(0,40);gravarUtilizadores(lista);return{ok:true,msg:`Adicionado ${kz(v)} ao saldo de ${u.nome.split(' ')[0]}. Novo saldo: ${kz(u.saldo)}.`};}else{if(Number(u.saldo||0)<v)return{ok:false,msg:`Saldo insuficiente. O utilizador tem apenas ${kz(u.saldo)}.`};u.saldo=Number(u.saldo||0)-v;u.movimentos=Array.isArray(u.movimentos)?u.movimentos:[];u.movimentos.unshift({id:novoId(),descricao:'🔻 '+(descricao||'Débito efectuado pelo administrador'),valor:v,tipo:'saida',estado:'aprovado',data:new Date().toISOString()});u.movimentos=u.movimentos.slice(0,40);gravarUtilizadores(lista);return{ok:true,msg:`Removido ${kz(v)} do saldo de ${u.nome.split(' ')[0]}. Novo saldo: ${kz(u.saldo)}.`};}}
+function ajustarSaldoUtilizador(tel,valor,tipo,descricao){const lista=obterUtilizadores();const u=lista.find(x=>x.telefone===tel);if(!u)return{ok:false,msg:'Utilizador não encontrado.'};const v=Number(valor);if(!v||v<=0)return{ok:false,msg:'Introduza um valor válido (> 0).'};if(tipo==='add'){u.saldo=Number(u.saldo||0)+v;u.movimentos=Array.isArray(u.movimentos)?u.movimentos:[];u.movimentos.unshift({id:novoId(),descricao:'💚 '+(descricao||'Crédito atribuído pelo administrador'),valor:v,tipo:'entrada',estado:'aprovado',data:new Date().toISOString()});u.movimentos=u.movimentos.slice(0,40);gravarUtilizadores(lista);return{ok:true,msg:`Adicionado ${kz(v)} ao saldo de ${u.nome.split(' ')[0]}. Novo saldo: ${kz(u.saldo)}.`};}else{if(Number(u.saldo||0)<v)return{ok:false,msg:`Saldo insuficiente. O utilizador tem apenas ${kz(u.saldo)}.`};u.saldo=Number(u.saldo||0)-v;if(u.bonusSaldo>u.saldo)u.bonusSaldo=u.saldo;u.movimentos=Array.isArray(u.movimentos)?u.movimentos:[];u.movimentos.unshift({id:novoId(),descricao:'🔻 '+(descricao||'Débito efectuado pelo administrador'),valor:v,tipo:'saida',estado:'aprovado',data:new Date().toISOString()});u.movimentos=u.movimentos.slice(0,40);gravarUtilizadores(lista);return{ok:true,msg:`Removido ${kz(v)} do saldo de ${u.nome.split(' ')[0]}. Novo saldo: ${kz(u.saldo)}.`};}}
 
 /* TORNEIOS */
 function obterTorneios(){const lista=ler(LS_TORNEIOS,[]);if(!Array.isArray(lista))return[];return lista.map(t=>{if(!Array.isArray(t.participantes))t.participantes=[];return t;});}
@@ -1589,48 +1659,22 @@ function probAmbasMarcam(ev,ladoSim){const est=estadoJogo(ev);const f=golosFinai
 function probParteMaisGolos(ev,escolha){const est=estadoJogo(ev);const f=golosFinais(ev);const ht=contagemGolos(ev,45);const g1=ht.casa+ht.fora;const g2=(f.casa+f.fora)-g1;if(est.fase==='terminado'||est.fase==='intervalo'||est.fase==='segunda'){if(escolha==='1')return g1>g2?1:0;if(escolha==='X')return g1===g2?1:0;return g2>g1?1:0;}let g1Atual=0,g2Atual=0;if(est.fase==='primeira'){const r=contagemGolos(ev,est.minuto);g1Atual=r.casa+r.fora;g2Atual=0;}const lam=lambdasBase(ev);const lamTotal1=(lam.casa+lam.fora)*(Math.max(0,45-(est.fase==='primeira'?est.minuto:0))/90);const lamTotal2=(lam.casa+lam.fora)*(Math.max(0,90-Math.max(45,est.fase==='segunda'?est.minuto:0))/90);let p1=0,pX=0,p2=0;const maxK=8;for(let a=0;a<=maxK;a++){const pA=poisson(a,lamTotal1);for(let b=0;b<=maxK;b++){const p=pA*poisson(b,lamTotal2);const total1=g1Atual+a;const total2=g2Atual+b;if(total1>total2)p1+=p;else if(total1===total2)pX+=p;else p2+=p;}}const soma=p1+pX+p2||1;if(escolha==='1')return p1/soma;if(escolha==='X')return pX/soma;return p2/soma;}
 function probGolosParteEquipa(ev,parte,ladoEquipa,linha,lado){const est=estadoJogo(ev);const f=golosFinais(ev);const ht=contagemGolos(ev,45);const g1C=ht.casa,g1F=ht.fora;const g2C=Math.max(0,f.casa-g1C),g2F=Math.max(0,f.fora-g1F);if(est.fase==='terminado'){const g=parte==='1'?(ladoEquipa==='casa'?g1C:g1F):(ladoEquipa==='casa'?g2C:g2F);if(lado==='over')return g>linha?1:0;return g<linha?1:0;}if(parte==='1'){if(est.fase==='intervalo'||est.fase==='segunda'){const g=ladoEquipa==='casa'?g1C:g1F;if(lado==='over')return g>linha?1:0;return g<linha?1:0;}}else{if(est.fase==='segunda'){const r=contagemGolos(ev,est.minuto);const rC=Math.max(0,r.casa-g1C);const rF=Math.max(0,r.fora-g1F);const g=ladoEquipa==='casa'?rC:rF;if(lado==='over')return g>linha?1:0;return g<linha?1:0;}}let baseC=parte==='1'?g1C:g2C;let baseF=parte==='1'?g1F:g2F;let minRem=45;if(parte==='1'){if(est.fase==='primeira')minRem=Math.max(0,45-est.minuto);else minRem=45;}else{if(est.fase==='segunda')minRem=Math.max(0,90-est.minuto);else minRem=45;}const totalRem=minRem/90;const lam=lambdasBase(ev);const lamEq=(ladoEquipa==='casa'?lam.casa:lam.fora)*totalRem;const baseEq=ladoEquipa==='casa'?baseC:baseF;let probOver=0,probUnder=0;const maxK=10;for(let k=0;k<=maxK;k++){const p=poisson(k,lamEq);const total=baseEq+k;if(total>linha)probOver+=p;if(total<linha)probUnder+=p;}const soma=probOver+probUnder||1;if(lado==='over')return probOver/soma;return probUnder/soma;}
 
-/* ═══ NOVOS MERCADOS: Total golos por parte, ambas marcam por parte, 1x2 por parte ═══ */
 function probGolosTotalParte(ev,parte,linha,lado){
   const est=estadoJogo(ev);
   const f=golosFinais(ev);
   const ht=contagemGolos(ev,45);
   const g1C=ht.casa,g1F=ht.fora;
   const g2C=Math.max(0,f.casa-g1C),g2F=Math.max(0,f.fora-g1F);
-  if(est.fase==='terminado'){
-    const g=parte==='1'?(g1C+g1F):(g2C+g2F);
-    if(lado==='over')return g>linha?1:0;
-    return g<linha?1:0;
-  }
-  if(parte==='1'&&(est.fase==='intervalo'||est.fase==='segunda')){
-    const g=g1C+g1F;
-    if(lado==='over')return g>linha?1:0;
-    return g<linha?1:0;
-  }
+  if(est.fase==='terminado'){const g=parte==='1'?(g1C+g1F):(g2C+g2F);if(lado==='over')return g>linha?1:0;return g<linha?1:0;}
+  if(parte==='1'&&(est.fase==='intervalo'||est.fase==='segunda')){const g=g1C+g1F;if(lado==='over')return g>linha?1:0;return g<linha?1:0;}
   let baseGoals=0,minRem=45;
-  if(parte==='1'){
-    if(est.fase==='primeira'){
-      const r=contagemGolos(ev,est.minuto);
-      baseGoals=r.casa+r.fora;
-      minRem=Math.max(0,45-est.minuto);
-    }
-  }else{
-    if(est.fase==='segunda'){
-      const r=contagemGolos(ev,est.minuto);
-      baseGoals=Math.max(0,r.casa-g1C)+Math.max(0,r.fora-g1F);
-      minRem=Math.max(0,90-est.minuto);
-    }
-  }
+  if(parte==='1'){if(est.fase==='primeira'){const r=contagemGolos(ev,est.minuto);baseGoals=r.casa+r.fora;minRem=Math.max(0,45-est.minuto);}}else{if(est.fase==='segunda'){const r=contagemGolos(ev,est.minuto);baseGoals=Math.max(0,r.casa-g1C)+Math.max(0,r.fora-g1F);minRem=Math.max(0,90-est.minuto);}}
   const lam=lambdasBase(ev);
   const fator=minRem/90;
   const lamTotal=(lam.casa+lam.fora)*fator;
   let probOver=0,probUnder=0;
   const maxK=12;
-  for(let k=0;k<=maxK;k++){
-    const p=poisson(k,lamTotal);
-    const total=baseGoals+k;
-    if(total>linha)probOver+=p;
-    if(total<linha)probUnder+=p;
-  }
+  for(let k=0;k<=maxK;k++){const p=poisson(k,lamTotal);const total=baseGoals+k;if(total>linha)probOver+=p;if(total<linha)probUnder+=p;}
   const soma=probOver+probUnder||1;
   if(lado==='over')return probOver/soma;
   return probUnder/soma;
@@ -1643,42 +1687,16 @@ function probAmbasMarcamParte(ev,parte,ladoSim){
   const g2C=Math.max(0,f.casa-g1C),g2F=Math.max(0,f.fora-g1F);
   const pC=parte==='1'?g1C:g2C;
   const pF=parte==='1'?g1F:g2F;
-  if(est.fase==='terminado'){
-    const ambas=pC>0&&pF>0;
-    return ladoSim?(ambas?1:0):(ambas?0:1);
-  }
-  if(parte==='1'&&(est.fase==='intervalo'||est.fase==='segunda')){
-    const ambas=g1C>0&&g1F>0;
-    return ladoSim?(ambas?1:0):(ambas?0:1);
-  }
+  if(est.fase==='terminado'){const ambas=pC>0&&pF>0;return ladoSim?(ambas?1:0):(ambas?0:1);}
+  if(parte==='1'&&(est.fase==='intervalo'||est.fase==='segunda')){const ambas=g1C>0&&g1F>0;return ladoSim?(ambas?1:0):(ambas?0:1);}
   let baseC=0,baseF=0,minRem=45;
-  if(parte==='1'){
-    if(est.fase==='primeira'){
-      const r=contagemGolos(ev,est.minuto);
-      baseC=r.casa;baseF=r.fora;
-      minRem=Math.max(0,45-est.minuto);
-    }
-  }else{
-    if(est.fase==='segunda'){
-      const r=contagemGolos(ev,est.minuto);
-      baseC=Math.max(0,r.casa-g1C);
-      baseF=Math.max(0,r.fora-g1F);
-      minRem=Math.max(0,90-est.minuto);
-    }
-  }
+  if(parte==='1'){if(est.fase==='primeira'){const r=contagemGolos(ev,est.minuto);baseC=r.casa;baseF=r.fora;minRem=Math.max(0,45-est.minuto);}}else{if(est.fase==='segunda'){const r=contagemGolos(ev,est.minuto);baseC=Math.max(0,r.casa-g1C);baseF=Math.max(0,r.fora-g1F);minRem=Math.max(0,90-est.minuto);}}
   const lam=lambdasBase(ev);
   const fator=minRem/90;
   const lamC=lam.casa*fator,lamF=lam.fora*fator;
   let probAmbas=0;
   const maxK=8;
-  for(let h=0;h<=maxK;h++){
-    const pH=poisson(h,lamC);
-    for(let a=0;a<=maxK;a++){
-      const p=pH*poisson(a,lamF);
-      const fc=baseC+h,ff=baseF+a;
-      if(fc>0&&ff>0)probAmbas+=p;
-    }
-  }
+  for(let h=0;h<=maxK;h++){const pH=poisson(h,lamC);for(let a=0;a<=maxK;a++){const p=pH*poisson(a,lamF);const fc=baseC+h,ff=baseF+a;if(fc>0&&ff>0)probAmbas+=p;}}
   if(ladoSim)return probAmbas;
   return 1-probAmbas;
 }
@@ -1690,46 +1708,16 @@ function prob1x2Parte(ev,parte,escolha){
   const g2C=Math.max(0,f.casa-g1C),g2F=Math.max(0,f.fora-g1F);
   const pC=parte==='1'?g1C:g2C;
   const pF=parte==='1'?g1F:g2F;
-  if(est.fase==='terminado'){
-    if(escolha==='1')return pC>pF?1:0;
-    if(escolha==='X')return pC===pF?1:0;
-    return pF>pC?1:0;
-  }
-  if(parte==='1'&&(est.fase==='intervalo'||est.fase==='segunda')){
-    if(escolha==='1')return g1C>g1F?1:0;
-    if(escolha==='X')return g1C===g1F?1:0;
-    return g1F>g1C?1:0;
-  }
+  if(est.fase==='terminado'){if(escolha==='1')return pC>pF?1:0;if(escolha==='X')return pC===pF?1:0;return pF>pC?1:0;}
+  if(parte==='1'&&(est.fase==='intervalo'||est.fase==='segunda')){if(escolha==='1')return g1C>g1F?1:0;if(escolha==='X')return g1C===g1F?1:0;return g1F>g1C?1:0;}
   let baseC=0,baseF=0,minRem=45;
-  if(parte==='1'){
-    if(est.fase==='primeira'){
-      const r=contagemGolos(ev,est.minuto);
-      baseC=r.casa;baseF=r.fora;
-      minRem=Math.max(0,45-est.minuto);
-    }
-  }else{
-    if(est.fase==='segunda'){
-      const r=contagemGolos(ev,est.minuto);
-      baseC=Math.max(0,r.casa-g1C);
-      baseF=Math.max(0,r.fora-g1F);
-      minRem=Math.max(0,90-est.minuto);
-    }
-  }
+  if(parte==='1'){if(est.fase==='primeira'){const r=contagemGolos(ev,est.minuto);baseC=r.casa;baseF=r.fora;minRem=Math.max(0,45-est.minuto);}}else{if(est.fase==='segunda'){const r=contagemGolos(ev,est.minuto);baseC=Math.max(0,r.casa-g1C);baseF=Math.max(0,r.fora-g1F);minRem=Math.max(0,90-est.minuto);}}
   const lam=lambdasBase(ev);
   const fator=minRem/90;
   const lamC=lam.casa*fator,lamF=lam.fora*fator;
   let p1=0,pX=0,p2=0;
   const maxK=10;
-  for(let h=0;h<=maxK;h++){
-    const pH=poisson(h,lamC);
-    for(let a=0;a<=maxK;a++){
-      const p=pH*poisson(a,lamF);
-      const fc=baseC+h,ff=baseF+a;
-      if(fc>ff)p1+=p;
-      else if(fc===ff)pX+=p;
-      else p2+=p;
-    }
-  }
+  for(let h=0;h<=maxK;h++){const pH=poisson(h,lamC);for(let a=0;a<=maxK;a++){const p=pH*poisson(a,lamF);const fc=baseC+h,ff=baseF+a;if(fc>ff)p1+=p;else if(fc===ff)pX+=p;else p2+=p;}}
   const soma=p1+pX+p2||1;
   if(escolha==='1')return p1/soma;
   if(escolha==='X')return pX/soma;
@@ -1740,7 +1728,6 @@ function oddsMercadosExtra(ev){
   const p90=probs90Mercado(ev);
   const pHt=probsHTMercado(ev);
   const o={};
-  // 1X2 e Dupla
   o.empate=probParaOdd(p90.empate);
   o.dupla1X=probParaOdd(p90.casa+p90.empate);
   o.dupla12=probParaOdd(p90.casa+p90.fora);
@@ -1748,42 +1735,30 @@ function oddsMercadosExtra(ev){
   o.ht1=probParaOdd(pHt.casa);
   o.htX=probParaOdd(pHt.empate);
   o.ht2=probParaOdd(pHt.fora);
-  // Total 90' O/U
   for(let n=0;n<=6;n++)o['total_'+n]=probParaOdd(probGolosTotal(ev,n,'over'));
   for(let n=1;n<=6;n++)o['total_menos_'+n]=probParaOdd(probGolosTotal(ev,n,'under'));
-  // Casa / Fora 90' O/U
   for(let n=0;n<=4;n++){o['casa_'+n]=probParaOdd(probGolosEquipa(ev,'casa',n,'over'));o['fora_'+n]=probParaOdd(probGolosEquipa(ev,'fora',n,'over'));}
   for(let n=1;n<=4;n++){o['casa_menos_'+n]=probParaOdd(probGolosEquipa(ev,'casa',n,'under'));o['fora_menos_'+n]=probParaOdd(probGolosEquipa(ev,'fora',n,'under'));}
-  // BTTS 90'
   o.btts_sim=probParaOdd(probAmbasMarcam(ev,true));
   o.btts_nao=probParaOdd(probAmbasMarcam(ev,false));
-  // Parte com mais golos
   o.parte_1=probParaOdd(probParteMaisGolos(ev,'1'));
   o.parte_X=probParaOdd(probParteMaisGolos(ev,'X'));
   o.parte_2=probParaOdd(probParteMaisGolos(ev,'2'));
-  // 1ª PARTE — Total golos O/U (0-5)
   for(let n=0;n<=5;n++)o['ht_total_'+n]=probParaOdd(probGolosTotalParte(ev,'1',n,'over'));
   for(let n=1;n<=5;n++)o['ht_menos_'+n]=probParaOdd(probGolosTotalParte(ev,'1',n,'under'));
-  // 1ª PARTE — Golos Casa O/U (0-5)
   for(let n=0;n<=5;n++)o['ht_casa_'+n]=probParaOdd(probGolosParteEquipa(ev,'1','casa',n,'over'));
   for(let n=1;n<=5;n++)o['ht_casa_menos_'+n]=probParaOdd(probGolosParteEquipa(ev,'1','casa',n,'under'));
-  // 1ª PARTE — Golos Fora O/U (0-5)
   for(let n=0;n<=5;n++)o['ht_fora_'+n]=probParaOdd(probGolosParteEquipa(ev,'1','fora',n,'over'));
   for(let n=1;n<=5;n++)o['ht_fora_menos_'+n]=probParaOdd(probGolosParteEquipa(ev,'1','fora',n,'under'));
-  // 1ª PARTE — Ambas marcam
   o.ht_btts_sim=probParaOdd(probAmbasMarcamParte(ev,'1',true));
   o.ht_btts_nao=probParaOdd(probAmbasMarcamParte(ev,'1',false));
-  // 2ª PARTE — 1X2
   o.st_1=probParaOdd(prob1x2Parte(ev,'2','1'));
   o.st_X=probParaOdd(prob1x2Parte(ev,'2','X'));
   o.st_2=probParaOdd(prob1x2Parte(ev,'2','2'));
-  // 2ª PARTE — Total golos O/U
   for(let n=0;n<=5;n++)o['st_total_'+n]=probParaOdd(probGolosTotalParte(ev,'2',n,'over'));
   for(let n=1;n<=5;n++)o['st_menos_'+n]=probParaOdd(probGolosTotalParte(ev,'2',n,'under'));
-  // 2ª PARTE — Golos Casa O/U
   for(let n=0;n<=5;n++)o['st_casa_'+n]=probParaOdd(probGolosParteEquipa(ev,'2','casa',n,'over'));
   for(let n=1;n<=5;n++)o['st_casa_menos_'+n]=probParaOdd(probGolosParteEquipa(ev,'2','casa',n,'under'));
-  // 2ª PARTE — Golos Fora O/U
   for(let n=0;n<=5;n++)o['st_fora_'+n]=probParaOdd(probGolosParteEquipa(ev,'2','fora',n,'over'));
   for(let n=1;n<=5;n++)o['st_fora_menos_'+n]=probParaOdd(probGolosParteEquipa(ev,'2','fora',n,'under'));
   return o;
@@ -1871,9 +1846,88 @@ $$('.tab').forEach(t=>t.addEventListener('click',()=>mostrarFormulario(t.dataset
 ['#regTelefone','#logTelefone'].forEach(sel=>{const el=$(sel);el.addEventListener('input',()=>{const pos=el.selectionStart,antes=el.value.length;el.value=formatarInputTelefone(normalizarTelefone(el.value));const dif=el.value.length-antes;el.setSelectionRange(Math.max(0,pos+dif),Math.max(0,pos+dif));});});
 (function ligarInputConvite(){const el=$('#regConvite');if(!el)return;el.addEventListener('input',()=>{const pos=el.selectionStart,antes=el.value.length;el.value=normalizarCodigoConvite(el.value);const dif=el.value.length-antes;el.setSelectionRange(Math.max(0,pos+dif),Math.max(0,pos+dif));});})();
 
-$('#formRegisto').addEventListener('submit',e=>{e.preventDefault();const alerta=$('#alertaRegisto');const nome=$('#regNome').value.trim().replace(/\s+/g,' ');const tel=normalizarTelefone($('#regTelefone').value);const senha=$('#regSenha').value;const confirma=$('#regConfirma').value;const codigoConviteInput=normalizarCodigoConvite($('#regConvite').value);const partes=nome.split(' ').filter(p=>p.length>=2);if(partes.length<2)return mostrarAlerta(alerta,'erro','Introduza o nome completo.');if(tel===ADMIN.telefone)return mostrarAlerta(alerta,'erro','Este número está reservado ao administrador.');if(!telefoneValido(tel))return mostrarAlerta(alerta,'erro','Número angolano inválido.');const utilizadores=obterUtilizadores();if(utilizadores.some(u=>u.telefone===tel))return mostrarAlerta(alerta,'erro','Já existe conta com este número.');if(senha.length<6)return mostrarAlerta(alerta,'erro','A senha deve ter pelo menos 6 caracteres.');if(senha!==confirma)return mostrarAlerta(alerta,'erro','As senhas não coincidem.');if(!$('#regTermos').checked)return mostrarAlerta(alerta,'erro','Deve aceitar os termos para criar a conta.');let convidador=null;let codigoCadastroAdmin=null;if(codigoConviteInput){convidador=utilizadores.find(u=>u.codigoConvite===codigoConviteInput)||null;if(!convidador){const cc=encontrarCodigoCadastro(codigoConviteInput);if(cc&&cc.ativo)codigoCadastroAdmin=cc.codigo;else if(cc&&!cc.ativo)return mostrarAlerta(alerta,'erro','Este código foi desactivado.');else return mostrarAlerta(alerta,'erro','Código inválido.');}}const usadosCod=new Set(utilizadores.map(u=>u.codigoConvite).filter(Boolean));const novoCodigoConv=gerarCodigoUnico(usadosCod);const usadosRec=new Set(utilizadores.map(u=>u.codigoRecuperacao).filter(Boolean));const novoCodigoRec=gerarCodigoRecuperacaoUnico(usadosRec);const novo={nome,telefone:tel,senha:cifrar(senha),saldo:0,emJogo:0,banco:'',iban:'',criadoEm:new Date().toISOString(),movimentos:[],apostas:[],codigoConvite:novoCodigoConv,convidados:[],bonusConvite:0,convidadoPor:convidador?codigoConviteInput:'',convidadoPorTel:convidador?convidador.telefone:'',codigoRecuperacao:novoCodigoRec,codigoCadastroSemBonus:codigoCadastroAdmin||'',welcomeBonusRecebido:0};const cfgReg=obterConfig();const valorBemVindo=Number(cfgReg.welcomeBonus)||0;if(valorBemVindo>0){novo.saldo=valorBemVindo;novo.welcomeBonusRecebido=valorBemVindo;novo.movimentos.push({id:novoId(),descricao:'🎉 Bónus de boas-vindas FREEPREMIER',valor:valorBemVindo,tipo:'entrada',estado:'aprovado',data:new Date().toISOString()});}utilizadores.push(novo);gravarUtilizadores(utilizadores);if(codigoCadastroAdmin)marcarCodigoCadastroUsado(codigoCadastroAdmin,novo);gravar(LS_SESSAO,tel);e.target.reset();entrarNoApp();if(codigoCadastroAdmin)setTimeout(()=>toast(`Conta criada com código público ${codigoCadastroAdmin}.`,'ok'),500);if(valorBemVindo>0){setTimeout(()=>{toast(`🎉 Bem-vindo! Recebeu um bónus de boas-vindas de ${kz(valorBemVindo)}!`,'ganho');const elSaldo=$('#saldoValor');if(elSaldo){elSaldo.classList.remove('flash');void elSaldo.offsetWidth;elSaldo.classList.add('flash');setTimeout(()=>elSaldo.classList.remove('flash'),1500);}},800);}setTimeout(()=>mostrarCodigoRecuperacao(novoCodigoRec,nome),500);});
+$('#formRegisto').addEventListener('submit',e=>{
+  e.preventDefault();
+  const alerta=$('#alertaRegisto');
+  const nome=$('#regNome').value.trim().replace(/\s+/g,' ');
+  const tel=normalizarTelefone($('#regTelefone').value);
+  const senha=$('#regSenha').value;
+  const confirma=$('#regConfirma').value;
+  const codigoConviteInput=normalizarCodigoConvite($('#regConvite').value);
+  const partes=nome.split(' ').filter(p=>p.length>=2);
+  if(partes.length<2)return mostrarAlerta(alerta,'erro','Introduza o nome completo.');
+  if(tel===ADMIN.telefone)return mostrarAlerta(alerta,'erro','Este número está reservado ao administrador.');
+  if(!telefoneValido(tel))return mostrarAlerta(alerta,'erro','Número angolano inválido.');
+  const utilizadores=obterUtilizadores();
+  if(utilizadores.some(u=>u.telefone===tel))return mostrarAlerta(alerta,'erro','Já existe conta com este número.');
+  if(senha.length<6)return mostrarAlerta(alerta,'erro','A senha deve ter pelo menos 6 caracteres.');
+  if(senha!==confirma)return mostrarAlerta(alerta,'erro','As senhas não coincidem.');
+  if(!$('#regTermos').checked)return mostrarAlerta(alerta,'erro','Deve aceitar os termos para criar a conta.');
+  let convidador=null;let codigoCadastroAdmin=null;
+  if(codigoConviteInput){
+    convidador=utilizadores.find(u=>u.codigoConvite===codigoConviteInput)||null;
+    if(!convidador){
+      const cc=encontrarCodigoCadastro(codigoConviteInput);
+      if(cc&&cc.ativo)codigoCadastroAdmin=cc.codigo;
+      else if(cc&&!cc.ativo)return mostrarAlerta(alerta,'erro','Este código foi desactivado.');
+      else return mostrarAlerta(alerta,'erro','Código inválido.');
+    }
+  }
+  const usadosCod=new Set(utilizadores.map(u=>u.codigoConvite).filter(Boolean));
+  const novoCodigoConv=gerarCodigoUnico(usadosCod);
+  const usadosRec=new Set(utilizadores.map(u=>u.codigoRecuperacao).filter(Boolean));
+  const novoCodigoRec=gerarCodigoRecuperacaoUnico(usadosRec);
+  const novo={
+    nome,telefone:tel,senha:cifrar(senha),saldo:0,emJogo:0,banco:'',iban:'',
+    criadoEm:new Date().toISOString(),movimentos:[],apostas:[],
+    codigoConvite:novoCodigoConv,convidados:[],bonusConvite:0,
+    convidadoPor:convidador?codigoConviteInput:'',
+    convidadoPorTel:convidador?convidador.telefone:'',
+    codigoRecuperacao:novoCodigoRec,
+    codigoCadastroSemBonus:codigoCadastroAdmin||'',
+    welcomeBonusRecebido:0,
+    bonusSaldo:0 // ⚠️ bónus bloqueado até ser apostado
+  };
+  const cfgReg=obterConfig();
+  const valorBemVindo=Number(cfgReg.welcomeBonus)||0;
+  if(valorBemVindo>0){
+    novo.saldo=valorBemVindo;
+    novo.bonusSaldo=valorBemVindo; // ⚠️ bloqueado
+    novo.welcomeBonusRecebido=valorBemVindo;
+    novo.movimentos.push({id:novoId(),descricao:'🎉 Bónus de boas-vindas FREEPREMIER (bloqueado — aposte para desbloquear)',valor:valorBemVindo,tipo:'entrada',estado:'aprovado',data:new Date().toISOString(),bonus:true});
+  }
+  utilizadores.push(novo);
+  gravarUtilizadores(utilizadores);
+  if(codigoCadastroAdmin)marcarCodigoCadastroUsado(codigoCadastroAdmin,novo);
+  gravar(LS_SESSAO,tel);
+  e.target.reset();
+  entrarNoApp();
+  if(codigoCadastroAdmin)setTimeout(()=>toast(`Conta criada com código público ${codigoCadastroAdmin}.`,'ok'),500);
+  if(valorBemVindo>0){
+    setTimeout(()=>{
+      toast(`🎉 Bem-vindo! Recebeu um bónus de boas-vindas de ${kz(valorBemVindo)} (bloqueado até ser apostado)!`,'ganho');
+      const elSaldo=$('#saldoValor');
+      if(elSaldo){elSaldo.classList.remove('flash');void elSaldo.offsetWidth;elSaldo.classList.add('flash');setTimeout(()=>elSaldo.classList.remove('flash'),1500);}
+    },800);
+  }
+  setTimeout(()=>mostrarCodigoRecuperacao(novoCodigoRec,nome),500);
+});
 
-$('#formLogin').addEventListener('submit',e=>{e.preventDefault();const alerta=$('#alertaLogin');const tel=normalizarTelefone($('#logTelefone').value);const senha=$('#logSenha').value;if(!telefoneValido(tel))return mostrarAlerta(alerta,'erro','Introduza um número angolano válido.');if(tel===ADMIN.telefone){if(senha!==ADMIN.senha)return mostrarAlerta(alerta,'erro','Senha de administrador incorrecta.');gravar(LS_SESSAO,tel);e.target.reset();entrarComoAdmin();toast('Sessão de administrador iniciada.');return;}const u=obterUtilizadores().find(x=>x.telefone===tel);if(!u)return mostrarAlerta(alerta,'erro','Conta não encontrada.');if(u.senha!==cifrar(senha))return mostrarAlerta(alerta,'erro','Senha incorrecta.');gravar(LS_SESSAO,tel);e.target.reset();entrarNoApp();toast('Sessão iniciada. Bem-vindo de volta!');});
+$('#formLogin').addEventListener('submit',e=>{
+  e.preventDefault();
+  const alerta=$('#alertaLogin');
+  const tel=normalizarTelefone($('#logTelefone').value);
+  const senha=$('#logSenha').value;
+  if(!telefoneValido(tel))return mostrarAlerta(alerta,'erro','Introduza um número angolano válido.');
+  if(tel===ADMIN.telefone){
+    if(senha!==ADMIN.senha)return mostrarAlerta(alerta,'erro','Senha de administrador incorrecta.');
+    gravar(LS_SESSAO,tel);e.target.reset();entrarComoAdmin();toast('Sessão de administrador iniciada.');return;
+  }
+  const u=obterUtilizadores().find(x=>x.telefone===tel);
+  if(!u)return mostrarAlerta(alerta,'erro','Conta não encontrada.');
+  if(u.senha!==cifrar(senha))return mostrarAlerta(alerta,'erro','Senha incorrecta.');
+  gravar(LS_SESSAO,tel);e.target.reset();entrarNoApp();toast('Sessão iniciada. Bem-vindo de volta!');
+});
 
 $('#btnEsqueciSenha').addEventListener('click',abrirRecuperacaoSenha);
 function abrirRecuperacaoSenha(){abrirModal('Recuperar senha',`<div id="recPasso1"><p class="modal-text">Introduza o número de telemóvel associado à sua conta.</p><div class="field"><label>Número de telemóvel</label><div class="input"><span class="prefix">+244</span><input id="recTelefone" type="tel" inputmode="numeric" placeholder="923 456 789"></div></div><div class="alert" id="alertaRec1"></div><button class="btn btn-primary" id="recContinuar" type="button">Continuar</button></div><div id="recPasso2" class="hidden"><div class="aposta-resumo"><small>Conta encontrada</small><strong id="recNomeConta">—</strong></div><div class="field"><label>Código de recuperação</label><div class="input"><input id="recCodigo" type="text" placeholder="XXXX-XXXX" maxlength="9" style="text-transform:uppercase;letter-spacing:3px;font-weight:800;text-align:center"></div></div><div class="field"><label>Nova senha</label><div class="input"><input id="recNovaSenha" type="password" placeholder="Mínimo 6 caracteres"></div></div><div class="field"><label>Confirmar nova senha</label><div class="input"><input id="recConfirma" type="password" placeholder="Repita a nova senha"></div></div><div class="alert" id="alertaRec2"></div><button class="btn btn-primary" id="recConfirmar" type="button">Redefinir senha</button><button class="btn btn-ghost" id="recVoltar" type="button" style="margin-top:12px">Voltar</button></div>`,corpo=>{const alerta1=corpo.querySelector('#alertaRec1');const alerta2=corpo.querySelector('#alertaRec2');const inputTel=corpo.querySelector('#recTelefone');const inputCod=corpo.querySelector('#recCodigo');const passo1=corpo.querySelector('#recPasso1');const passo2=corpo.querySelector('#recPasso2');inputTel.addEventListener('input',()=>{const pos=inputTel.selectionStart,antes=inputTel.value.length;inputTel.value=formatarInputTelefone(normalizarTelefone(inputTel.value));const dif=inputTel.value.length-antes;inputTel.setSelectionRange(Math.max(0,pos+dif),Math.max(0,pos+dif));});inputCod.addEventListener('input',()=>{let v=inputCod.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,8);if(v.length>4)v=v.slice(0,4)+'-'+v.slice(4);inputCod.value=v;});let contaEncontrada=null;corpo.querySelector('#recContinuar').addEventListener('click',()=>{const tel=normalizarTelefone(inputTel.value);if(!telefoneValido(tel)){alerta1.className='alert erro';alerta1.textContent='Introduza um número angolano válido.';return;}const u=obterUtilizadores().find(x=>x.telefone===tel);if(!u){alerta1.className='alert erro';alerta1.textContent='Não existe conta com este número.';return;}contaEncontrada=u;corpo.querySelector('#recNomeConta').textContent=u.nome+' · '+formatarTelefone(u.telefone);passo1.classList.add('hidden');passo2.classList.remove('hidden');alerta2.className='alert';alerta2.textContent='';setTimeout(()=>inputCod.focus(),80);});corpo.querySelector('#recConfirmar').addEventListener('click',()=>{if(!contaEncontrada)return;const cod=inputCod.value.trim().toUpperCase();const nova=corpo.querySelector('#recNovaSenha').value;const conf=corpo.querySelector('#recConfirma').value;if(!cod){alerta2.className='alert erro';alerta2.textContent='Introduza o código de recuperação.';return;}if(!contaEncontrada.codigoRecuperacao){alerta2.className='alert erro';alerta2.textContent='Esta conta não tem código de recuperação definido.';return;}if(cod!==contaEncontrada.codigoRecuperacao){alerta2.className='alert erro';alerta2.textContent='Código de recuperação incorrecto.';return;}if(nova.length<6){alerta2.className='alert erro';alerta2.textContent='A nova senha deve ter pelo menos 6 caracteres.';return;}if(nova!==conf){alerta2.className='alert erro';alerta2.textContent='As senhas não coincidem.';return;}const lista=obterUtilizadores();const idx=lista.findIndex(x=>x.telefone===contaEncontrada.telefone);if(idx>-1){lista[idx].senha=cifrar(nova);gravarUtilizadores(lista);}alerta2.className='alert ok';alerta2.textContent='Senha redefinida com sucesso!';toast('Senha redefinida com sucesso.','ganho');setTimeout(()=>{fecharModal();const loginTel=$('#logTelefone');if(loginTel)loginTel.value=formatarInputTelefone(contaEncontrada.telefone);const senhaEl=$('#logSenha');if(senhaEl)senhaEl.focus();},1500);});corpo.querySelector('#recVoltar').addEventListener('click',()=>{passo1.classList.remove('hidden');passo2.classList.add('hidden');alerta1.className='alert';alerta1.textContent='';alerta2.className='alert';alerta2.textContent='';});});}
@@ -1897,20 +1951,73 @@ $('#boletimFab').addEventListener('click',abrirBoletim);
 /* RENDER UTILIZADOR */
 function saldoPendente(u){return(u.movimentos||[]).filter(m=>m.tipo==='saida'&&m.estado==='pendente').reduce((s,m)=>s+Number(m.valor),0);}
 function saldoDisponivel(u){return Math.max(0,u.saldo-saldoPendente(u));}
+/* ⚠️ NOVO: saldo disponível para LEVANTAR (exclui bónus bloqueado) */
+function saldoDisponivelLevantamento(u){
+  const base = saldoDisponivel(u);
+  const bonus = Number(u.bonusSaldo||0);
+  return Math.max(0, base - bonus);
+}
 
 let FILTRO_GH='todos';
 function recolherLevantamentosGlobais(){const users=obterUtilizadores();const lista=[];users.forEach(u=>{(u.movimentos||[]).forEach(m=>{if(m.tipo!=='saida')return;if(m.estado==='rejeitado')return;const desc=String(m.descricao||'').toLowerCase();const ehLevant=(m.banco||m.iban)||desc.includes('levantamento');if(!ehLevant)return;lista.push({id:m.id,nome:u.nome,telefone:u.telefone,banco:m.banco||u.banco||'—',valor:Number(m.valor||0),data:m.data,dataProcessamento:m.dataProcessamento||null,estado:m.estado});});});lista.sort((a,b)=>new Date(b.data)-new Date(a.data));return lista;}
 function renderizarLevantamentosGlobais(){const alvo=$('#globalLevantLista');if(!alvo)return;const todos=recolherLevantamentosGlobais();const proc=todos.filter(l=>l.estado==='pendente');const concl=todos.filter(l=>l.estado==='aprovado');const totalConcluido=concl.reduce((s,l)=>s+l.valor,0);const totalProc=proc.reduce((s,l)=>s+l.valor,0);const elC=$('#ghTotalConcluido');if(elC)elC.textContent=kz(totalConcluido);const elP=$('#ghTotalProcessamento');if(elP)elP.textContent=kz(totalProc);const elT=$('#ghTotalRegistos');if(elT)elT.textContent=todos.length;const elBadge=$('#globalLevantBadge');if(elBadge)elBadge.textContent=todos.length+(todos.length===1?' registo':' registos');const ct=$('#ghCountTodos');if(ct)ct.textContent=todos.length;const cp=$('#ghCountProc');if(cp)cp.textContent=proc.length;const cc=$('#ghCountConcluido');if(cc)cc.textContent=concl.length;let mostrar=todos;if(FILTRO_GH==='processamento')mostrar=proc;else if(FILTRO_GH==='concluido')mostrar=concl;if(!mostrar.length){alvo.innerHTML=`<div class="vazio" style="padding:24px 18px;font-size:12.5px;background:linear-gradient(180deg,#fff, #F0FBFF);border:2px dashed rgba(0,184,212,.3)">${FILTRO_GH==='todos'?'Ainda não existem levantamentos registados na plataforma.<br>Assim que houver, aparecerão aqui.':FILTRO_GH==='processamento'?'Nenhum levantamento em processamento neste momento.':'Nenhum levantamento concluído por enquanto.'}</div>`;return;}const visiveis=mostrar.slice(0,30);alvo.innerHTML=visiveis.map(l=>{let classeEstado='',textoEstado='';if(l.estado==='pendente'){classeEstado='proc';textoEstado='Em processamento';}else if(l.estado==='aprovado'){classeEstado='concluido';textoEstado='Processamento concluído';}else{classeEstado='proc';textoEstado='Em processamento';}const inicial=(l.nome||'?').trim().charAt(0).toUpperCase();const dataMostrar=(l.estado==='aprovado'&&l.dataProcessamento)?`Concluído em ${dataCurta(l.dataProcessamento)}`:`Solicitado em ${dataCurta(l.data)}`;const dotHtml=l.estado==='pendente'?'<span class="glv-dot"></span>':'';return`<div class="global-levant-item ${classeEstado}"><div class="glv-top"><div class="glv-avatar">${escapar(inicial)}</div><div class="glv-info"><strong>${escapar(l.nome)}</strong><small>${dataMostrar}</small></div><div class="glv-valor">${kz(l.valor)}</div></div><div class="glv-footer"><span class="glv-banco"><span class="glv-ico">🏦</span>${escapar(l.banco||'—')}</span><span class="glv-estado ${classeEstado}">${dotHtml}${textoEstado}</span></div></div>`;}).join('');}
 (function ligarFiltrosGlobais(){const el=$('#globalLevantFiltros');if(!el)return;el.querySelectorAll('[data-gh-filtro]').forEach(b=>{b.addEventListener('click',()=>{FILTRO_GH=b.dataset.ghFiltro;el.querySelectorAll('.gh-filtro').forEach(x=>x.classList.toggle('active',x===b));renderizarLevantamentosGlobais();});});})();
 
-function renderizarTudo(){const u=utilizadorAtual();if(!u)return;const cfg=obterConfig();$('#topNome').textContent=u.nome;$('#topTelefone').textContent=formatarTelefone(u.telefone);$('#avatarInicial').textContent=u.nome.trim()[0].toUpperCase();$('#saldoValor').textContent=kz(u.saldo);$('#emJogoValor').textContent=kz(u.emJogo);$('#pendenteValor').textContent=kz(saldoPendente(u));$('#totalValor').textContent=kz(u.saldo+u.emJogo);$('#perfilInicial').textContent=u.nome.trim()[0].toUpperCase();$('#perfilNome').textContent=u.nome;$('#perfilTelefone').textContent=formatarTelefone(u.telefone);$('#perfilCriado').textContent=dataLonga(u.criadoEm);$('#perfilSaldo').textContent=kz(u.saldo);const bancoEl=$('#dadosBanco');const ibanEl=$('#dadosIban');if(bancoEl&&document.activeElement!==bancoEl)bancoEl.value=u.banco||'';if(ibanEl&&document.activeElement!==ibanEl)ibanEl.value=u.iban||'';const badge=$('#bancoEstado');if(badge){if(u.banco&&u.iban){badge.textContent='CONFIGURADO';badge.classList.remove('falta');}else{badge.textContent='NÃO CONFIGURADO';badge.classList.add('falta');}}const apostas=u.apostas||[];const ativas=apostas.filter(a=>a.estado==='ativa');const totalApostado=apostas.reduce((s,a)=>s+Number(a.valor||0),0);$('#perfilApostasAtivas').textContent=ativas.length;$('#perfilTotalApostado').textContent=kz(totalApostado);const linhaCP=$('#linhaConvidadoPor');if(linhaCP){if(u.convidadoPor){linhaCP.style.display='';const el=$('#perfilConvidadoPor');if(el)el.textContent=u.convidadoPor;}else linhaCP.style.display='none';}const linhaCC=$('#linhaCodigoCadastro');if(linhaCC){if(u.codigoCadastroSemBonus){linhaCC.style.display='';const el=$('#perfilCodigoCadastro');if(el)el.textContent=u.codigoCadastroSemBonus;}else linhaCC.style.display='none';}const codEl=$('#codigoConviteValor');if(codEl)codEl.textContent=u.codigoConvite||'—';const totalConv=$('#conviteTotalConvidados');if(totalConv)totalConv.textContent=(u.convidados||[]).length;const bonusConv=$('#conviteBonusGanho');if(bonusConv)bonusConv.textContent=kz(u.bonusConvite||0);const badgeConv=$('#conviteBadge');if(badgeConv)badgeConv.textContent=cfg.bonusConvite+'%';const percDisplay=$('#convitePercentDisplay');if(percDisplay)percDisplay.textContent=cfg.bonusConvite;const tipPerc=$('#tipBonusPercent');if(tipPerc)tipPerc.textContent=cfg.bonusConvite;const adminPerc=$('#adminBonusPercent');if(adminPerc)adminPerc.textContent=cfg.bonusConvite;const tipWelcome=$('#tipWelcomeBonus');if(tipWelcome)tipWelcome.textContent=kz(cfg.welcomeBonus);const listaConv=$('#listaConvidados');if(listaConv){const lista=u.convidados||[];if(!lista.length)listaConv.innerHTML=`<div class="convite-vazio">Ainda não convidou ninguém.</div>`;else listaConv.innerHTML=lista.slice(0,10).map(c=>`<div class="convite-item"><div><strong>${escapar(c.nome)}</strong><small>${formatarTelefone(c.telefone)} · ${dataCurta(c.data)}</small></div><span class="convite-bonus">+${kz(c.bonus||0)}</span></div>`).join('');}const recEl=$('#codigoRecuperacaoValor');if(recEl)recEl.textContent=u.codigoRecuperacao||'—';renderizarMovimentos();renderizarMercado();renderizarApostas();renderizarComunicadosUser();renderizarTorneiosUser();renderizarLevantamentosGlobais();atualizarBotaoBoletim();atualizarBadgesChat();}
+function renderizarTudo(){
+  const u=utilizadorAtual();if(!u)return;
+  const cfg=obterConfig();
+  $('#topNome').textContent=u.nome;$('#topTelefone').textContent=formatarTelefone(u.telefone);
+  $('#avatarInicial').textContent=u.nome.trim()[0].toUpperCase();
+  $('#saldoValor').textContent=kz(u.saldo);
+  $('#emJogoValor').textContent=kz(u.emJogo);
+  $('#pendenteValor').textContent=kz(saldoPendente(u));
+  $('#totalValor').textContent=kz(u.saldo+u.emJogo);
+  // ⚠️ Bónus + disponível para levantar
+  const bEl=$('#bonusBloqueadoValor');if(bEl)bEl.textContent=kz(u.bonusSaldo||0);
+  const dEl=$('#disponivelLevantarValor');if(dEl)dEl.textContent=kz(saldoDisponivelLevantamento(u));
+  const bonusBox=$('#bonusLockBox');
+  if(bonusBox){
+    if(Number(u.bonusSaldo||0)>0){
+      bonusBox.classList.add('show');
+      const bv=$('#bonusLockValor');if(bv)bv.textContent=kz(u.bonusSaldo);
+    } else bonusBox.classList.remove('show');
+  }
+  // Perfil
+  $('#perfilInicial').textContent=u.nome.trim()[0].toUpperCase();
+  $('#perfilNome').textContent=u.nome;
+  $('#perfilTelefone').textContent=formatarTelefone(u.telefone);
+  $('#perfilCriado').textContent=dataLonga(u.criadoEm);
+  $('#perfilSaldo').textContent=kz(u.saldo);
+  const pBonus=$('#perfilBonus');if(pBonus)pBonus.textContent=kz(u.bonusSaldo||0);
+  const pDisp=$('#perfilDisponivelLevantar');if(pDisp)pDisp.textContent=kz(saldoDisponivelLevantamento(u));
+  const bancoEl=$('#dadosBanco');const ibanEl=$('#dadosIban');
+  if(bancoEl&&document.activeElement!==bancoEl)bancoEl.value=u.banco||'';
+  if(ibanEl&&document.activeElement!==ibanEl)ibanEl.value=u.iban||'';
+  const badge=$('#bancoEstado');
+  if(badge){if(u.banco&&u.iban){badge.textContent='CONFIGURADO';badge.classList.remove('falta');}else{badge.textContent='NÃO CONFIGURADO';badge.classList.add('falta');}}
+  const apostas=u.apostas||[];const ativas=apostas.filter(a=>a.estado==='ativa');const totalApostado=apostas.reduce((s,a)=>s+Number(a.valor||0),0);
+  $('#perfilApostasAtivas').textContent=ativas.length;
+  $('#perfilTotalApostado').textContent=kz(totalApostado);
+  const linhaCP=$('#linhaConvidadoPor');if(linhaCP){if(u.convidadoPor){linhaCP.style.display='';const el=$('#perfilConvidadoPor');if(el)el.textContent=u.convidadoPor;}else linhaCP.style.display='none';}
+  const linhaCC=$('#linhaCodigoCadastro');if(linhaCC){if(u.codigoCadastroSemBonus){linhaCC.style.display='';const el=$('#perfilCodigoCadastro');if(el)el.textContent=u.codigoCadastroSemBonus;}else linhaCC.style.display='none';}
+  const codEl=$('#codigoConviteValor');if(codEl)codEl.textContent=u.codigoConvite||'—';
+  const totalConv=$('#conviteTotalConvidados');if(totalConv)totalConv.textContent=(u.convidados||[]).length;
+  const bonusConv=$('#conviteBonusGanho');if(bonusConv)bonusConv.textContent=kz(u.bonusConvite||0);
+  const badgeConv=$('#conviteBadge');if(badgeConv)badgeConv.textContent=cfg.bonusConvite+'%';
+  const percDisplay=$('#convitePercentDisplay');if(percDisplay)percDisplay.textContent=cfg.bonusConvite;
+  const tipPerc=$('#tipBonusPercent');if(tipPerc)tipPerc.textContent=cfg.bonusConvite;
+  const adminPerc=$('#adminBonusPercent');if(adminPerc)adminPerc.textContent=cfg.bonusConvite;
+  const tipWelcome=$('#tipWelcomeBonus');if(tipWelcome)tipWelcome.textContent=kz(cfg.welcomeBonus);
+  const listaConv=$('#listaConvidados');if(listaConv){const lista=u.convidados||[];if(!lista.length)listaConv.innerHTML=`<div class="convite-vazio">Ainda não convidou ninguém.</div>`;else listaConv.innerHTML=lista.slice(0,10).map(c=>`<div class="convite-item"><div><strong>${escapar(c.nome)}</strong><small>${formatarTelefone(c.telefone)} · ${dataCurta(c.data)}</small></div><span class="convite-bonus">+${kz(c.bonus||0)}</span></div>`).join('');}
+  const recEl=$('#codigoRecuperacaoValor');if(recEl)recEl.textContent=u.codigoRecuperacao||'—';
+  renderizarMovimentos();renderizarMercado();renderizarApostas();renderizarComunicadosUser();renderizarTorneiosUser();renderizarLevantamentosGlobais();atualizarBotaoBoletim();atualizarBadgesChat();
+}
 function renderizarMovimentos(){const u=utilizadorAtual();const alvo=$('#listaMovimentos');if(!alvo)return;if(!u||!u.movimentos||u.movimentos.length===0){alvo.innerHTML=`<div class="vazio">Ainda não existem movimentos.<br>Faça um pedido de depósito para começar a apostar.</div>`;return;}const rotuloEstado={pendente:'Em processamento',aprovado:'Aprovado',rejeitado:'Rejeitado'};alvo.innerHTML=u.movimentos.map(m=>{let sinal='',icone='★',classe='aposta';if(m.tipo==='entrada'){sinal='+';icone='↓';classe='entrada';}else if(m.tipo==='saida'){sinal='−';icone='↑';classe='saida';}const pill=(m.estado&&rotuloEstado[m.estado])?` <span class="pill ${m.estado}">${rotuloEstado[m.estado]}</span>`:'';const mudo=m.estado==='rejeitado'?' mudo':'';return`<div class="mov"><div class="mov-ico ${classe}">${icone}</div><div class="mov-info"><strong>${escapar(m.descricao)}</strong><small>${dataCurta(m.data)}${pill}</small></div><div class="mov-val ${classe}${mudo}">${sinal} ${kz(m.valor)}</div></div>`;}).join('');}
 
 let FILTRO_ESPORTE='todos';
 function atualizarContadoresFiltro(){const eventos=obterEventos().filter(ev=>!eventoExpirado(ev));const cTodos=eventos.length;const cFut=eventos.filter(e=>(e.esporte||'futebol')==='futebol').length;const cBas=eventos.filter(e=>e.esporte==='basquetebol').length;const cAnd=eventos.filter(e=>e.esporte==='andebol').length;const cTen=eventos.filter(e=>e.esporte==='tenis').length;const cVol=eventos.filter(e=>e.esporte==='voleibol').length;const setT=$('#countTodos');if(setT)setT.textContent=cTodos;const setF=$('#countFutebol');if(setF)setF.textContent=cFut;const setB=$('#countBasquetebol');if(setB)setB.textContent=cBas;const setA=$('#countAndebol');if(setA)setA.textContent=cAnd;const setTen=$('#countTenis');if(setTen)setTen.textContent=cTen;const setVol=$('#countVoleibol');if(setVol)setVol.textContent=cVol;}
 (function ligarFiltrosMercado(){const el=$('#marketFiltros');if(!el)return;el.querySelectorAll('[data-esporte]').forEach(b=>{b.addEventListener('click',()=>{FILTRO_ESPORTE=b.dataset.esporte;el.querySelectorAll('.filtro-chip').forEach(x=>x.classList.toggle('active',x===b));renderizarMercado();});});})();
 
-/* Helper UI: gera bloco Over/Under para um conjunto de chaves */
 function renderOUGrupo(evId,mx,keyOver,keyUnder,terminado){
   const over=[0,1,2,3,4,5].map(n=>`<button class="opcao-odd" type="button" data-extra-ou="1" data-lado="over" data-linha="${n}" data-evid="${evId}" ${terminado?'disabled':''}><span>+ ${n}</span><strong>${(mx[keyOver+n]||1.10).toFixed(2)}</strong></button>`).join('');
   const under=[1,2,3,4,5].map(n=>`<button class="opcao-odd" type="button" data-extra-ou="1" data-lado="under" data-linha="${n}" data-evid="${evId}" ${terminado?'disabled':''}><span>- ${n}</span><strong>${(mx[keyUnder+n]||1.10).toFixed(2)}</strong></button>`).join('');
@@ -2055,7 +2162,6 @@ function renderizarMercado(){
     return`<div class="${classes.join(' ')}"><div class="evento-top"><span class="liga-badge esporte-${esporte}"><span class="sport-emoji">${ESPORTE_EMOJI[esporte]}</span>${escapar(ev.liga)}</span><span class="hora">${escapar(rotuloHora(ev.inicio))}</span></div><div class="evento-times"><div class="time">${escapar(ev.casa)}</div><div class="vs">VS</div><div class="time dir">${escapar(ev.fora)}</div></div><div class="placar-live" data-live="${ev.id}">${renderPill(est)}</div><div data-resultado="${ev.id}">${renderResultado(ev)}</div><div class="odds"><div class="odd-wrap"><button class="odd" type="button" tabindex="-1"><small>1</small><strong data-odd-casa="${ev.id}" class="${clsCasa}">${odds.oddCasa.toFixed(2)}</strong></button><button class="odd-add" type="button" data-add-evento="${ev.id}" data-add-lado="casa" ${terminado?'disabled':''}>${selCasa?'✓':'+'}</button></div><div class="odd-wrap"><button class="odd" type="button" tabindex="-1"><small>2</small><strong data-odd-fora="${ev.id}" class="${clsFora}">${odds.oddFora.toFixed(2)}</strong></button><button class="odd-add" type="button" data-add-evento="${ev.id}" data-add-lado="fora" ${terminado?'disabled':''}>${selFora?'✓':'+'}</button></div></div>${extraHtml}</div>`;
   }).join('');
 
-  // Listeners — 1X2
   alvo.querySelectorAll('.odd-add[data-add-evento]').forEach(b=>{
     b.addEventListener('click',()=>{
       const id=Number(b.dataset.addEvento);
@@ -2071,12 +2177,10 @@ function renderizarMercado(){
     });
   });
 
-  // Listeners — toggle mercados
   alvo.querySelectorAll('[data-toggle-extra]').forEach(b=>{
     b.addEventListener('click',()=>{toggleExpansao(Number(b.dataset.toggleExtra));renderizarMercado();});
   });
 
-  // Listeners — mercados extra (não O/U)
   alvo.querySelectorAll('[data-extra]').forEach(b=>{
     b.addEventListener('click',()=>{
       const evId=Number(b.dataset.evid);
@@ -2118,7 +2222,6 @@ function renderizarMercado(){
     });
   });
 
-  // Listeners — O/U grupos (novos e os antigos do 90')
   alvo.querySelectorAll('[data-extra-ou]').forEach(b=>{
     b.addEventListener('click',()=>{
       const evId=Number(b.dataset.evid);
@@ -2127,8 +2230,6 @@ function renderizarMercado(){
       if(estadoJogo(ev).fase==='terminado'){toast('Evento terminado.','erro');return;}
       const lado=b.dataset.lado;
       const linha=Number(b.dataset.linha);
-      const tipoOU=b.dataset.ouTipo || '';
-      // Descobrir a que mercado pertence através do container
       const bloco=b.closest('.mercado-bloco');
       const titulo=bloco?bloco.querySelector('.mercado-titulo-mini')?.textContent||'':'';
       let mercado='total_golos';
@@ -2204,7 +2305,7 @@ function atualizarRelogios(){const eventos=obterEventos();const mapa=new Map(eve
 function renderizarAdmin(){renderizarPedidosAdmin();renderizarEventosAdmin();renderizarPerfilAdmin();renderizarDepositoAdmin();renderizarConfigAdmin();renderizarCodigosCadastroAdmin();renderizarTorneiosAdmin();}
 function todosOsPedidos(){const lista=[];obterUtilizadores().forEach(u=>{(u.movimentos||[]).forEach(m=>{if(m.tipo==='entrada'||m.tipo==='saida')lista.push({u,m});});});return lista;}
 function renderizarPedidosAdmin(){const alvo=$('#listaPedidos');if(!alvo)return;const todos=todosOsPedidos();const pendentes=todos.filter(x=>x.m.estado==='pendente').sort((a,b)=>new Date(b.m.data)-new Date(a.m.data));const historico=todos.filter(x=>x.m.estado==='aprovado'||x.m.estado==='rejeitado').sort((a,b)=>new Date(b.m.data)-new Date(a.m.data)).slice(0,15);const rotuloEstado={aprovado:'Aprovado',rejeitado:'Rejeitado'};const blocoBancario=(u,m)=>{if(m.tipo!=='saida')return'';const banco=(m.banco&&m.banco.trim())?m.banco:(u.banco||'');const iban=(m.iban&&m.iban.trim())?m.iban:(u.iban||'');if(!banco&&!iban)return`<div style="margin-top:8px;font-size:12px;color:#8D6E00;background:#FFF8E1;border:1px solid #FFE082;border-radius:8px;padding:8px 12px;font-weight:700">⚠️ Dados bancários não configurados.</div>`;return`<div style="margin-top:10px;background:linear-gradient(135deg, rgba(118,255,3,.08), rgba(67,160,71,.05));border:1px solid rgba(118,255,3,.25);border-left:4px solid var(--lima);border-radius:10px;padding:10px 12px"><div style="font-size:10.5px;font-weight:900;color:var(--verde-700);letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">🏦 Dados para transferência</div><div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:4px 0;border-bottom:1px dashed var(--linha)"><span style="color:var(--texto-sec);font-weight:700">Banco</span><b style="color:var(--verde-900);text-align:right;word-break:break-word">${escapar(banco||'—')}</b></div><div style="display:flex;justify-content:space-between;gap:10px;font-size:12.5px;padding:4px 0"><span style="color:var(--texto-sec);font-weight:700">IBAN</span><b style="color:var(--verde-900);text-align:right;word-break:break-all;font-family:ui-monospace,Menlo,monospace">${escapar(iban||'—')}</b></div></div>`;};const cartaoPendente=({u,m})=>`<div class="pedido"><div class="pedido-top"><div style="flex:1;min-width:0"><strong>${m.tipo==='entrada'?'Depósito':'Levantamento'} · ${escapar(u.nome)} <span class="pill pendente">Pendente</span></strong><small>${formatarTelefone(u.telefone)} · ${dataCurta(m.data)}</small><small>Saldo actual: <b>${kz(u.saldo)}</b></small>${blocoBancario(u,m)}</div><div class="pedido-val ${m.tipo}">${m.tipo==='entrada'?'+':'−'} ${kz(m.valor)}</div></div><div class="pedido-actions"><button class="btn-aprovar" type="button" data-id="${m.id}" data-acao="aprovar">Aprovar</button><button class="btn-rejeitar" type="button" data-id="${m.id}" data-acao="rejeitar">Rejeitar</button></div></div>`;const cartaoHistorico=({u,m})=>`<div class="pedido"><div class="pedido-top" style="margin-bottom:0"><div style="flex:1;min-width:0"><strong>${m.tipo==='entrada'?'Depósito':'Levantamento'} · ${escapar(u.nome)} <span class="pill ${m.estado}">${rotuloEstado[m.estado]}</span></strong><small>${formatarTelefone(u.telefone)} · ${dataCurta(m.data)}</small>${m.tipo==='saida'?blocoBancario(u,m):''}</div><div class="pedido-val ${m.tipo}">${m.tipo==='entrada'?'+':'−'} ${kz(m.valor)}</div></div></div>`;if(!todos.length){alvo.innerHTML=`<div class="vazio">Ainda não existem pedidos de depósito ou levantamento.</div>`;return;}let html='';html+=`<div class="grupo-titulo">Pendentes (${pendentes.length})</div>`;html+=pendentes.length?pendentes.map(cartaoPendente).join(''):`<div class="vazio">Não há pedidos pendentes neste momento.</div>`;if(historico.length){html+=`<div class="grupo-titulo">Histórico recente</div>`;html+=historico.map(cartaoHistorico).join('');}alvo.innerHTML=html;alvo.querySelectorAll('[data-acao]').forEach(b=>{b.addEventListener('click',()=>decidirPedido(b.dataset.id,b.dataset.acao));});}
-function decidirPedido(id,decisao){const lista=obterUtilizadores();for(const u of lista){const m=(u.movimentos||[]).find(x=>x.id===id);if(!m)continue;if(m.estado!=='pendente'){toast('Este pedido já foi processado.','erro');return;}if(decisao==='aprovar'){let extraMsg='';if(m.tipo==='entrada'){u.saldo+=Number(m.valor);const res=creditarBonusConvitePorDepositoNaLista(lista,u,Number(m.valor));if(res)extraMsg=` Bónus de ${res.percent}% (${kz(res.bonus)}) creditado a ${res.convidor.nome.split(' ')[0]}.`;}else{if(Number(m.valor)>u.saldo){toast('Saldo insuficiente do utilizador. Não é possível aprovar.','erro');return;}u.saldo-=Number(m.valor);}m.estado='aprovado';m.dataProcessamento=new Date().toISOString();toast((m.tipo==='entrada'?'Depósito':'Levantamento')+' de '+kz(m.valor)+' aprovado para '+u.nome.split(' ')[0]+'.'+extraMsg);}else{m.estado='rejeitado';m.dataProcessamento=new Date().toISOString();toast('Pedido de '+kz(m.valor)+' rejeitado.');}gravarUtilizadores(lista);renderizarAdmin();return;}toast('Pedido não encontrado.','erro');}
+function decidirPedido(id,decisao){const lista=obterUtilizadores();for(const u of lista){const m=(u.movimentos||[]).find(x=>x.id===id);if(!m)continue;if(m.estado!=='pendente'){toast('Este pedido já foi processado.','erro');return;}if(decisao==='aprovar'){let extraMsg='';if(m.tipo==='entrada'){u.saldo+=Number(m.valor);const res=creditarBonusConvitePorDepositoNaLista(lista,u,Number(m.valor));if(res)extraMsg=` Bónus de ${res.percent}% (${kz(res.bonus)}) creditado a ${res.convidor.nome.split(' ')[0]} (bloqueado até ser apostado).`;}else{if(Number(m.valor)>u.saldo){toast('Saldo insuficiente do utilizador. Não é possível aprovar.','erro');return;}u.saldo-=Number(m.valor);if(u.bonusSaldo>u.saldo)u.bonusSaldo=u.saldo;}m.estado='aprovado';m.dataProcessamento=new Date().toISOString();toast((m.tipo==='entrada'?'Depósito':'Levantamento')+' de '+kz(m.valor)+' aprovado para '+u.nome.split(' ')[0]+'.'+extraMsg);}else{m.estado='rejeitado';m.dataProcessamento=new Date().toISOString();toast('Pedido de '+kz(m.valor)+' rejeitado.');}gravarUtilizadores(lista);renderizarAdmin();return;}toast('Pedido não encontrado.','erro');}
 function renderizarEventosAdmin(){const alvo=$('#listaEventosAdmin');if(!alvo)return;const eventos=obterEventos().filter(ev=>!eventoExpirado(ev));if(!eventos.length){alvo.innerHTML=`<div class="vazio">Sem eventos activos. Crie o primeiro ou utilize as abas <b>Sync</b>, <b>365Scores</b> ou <b>Sofascore</b>.</div>`;return;}alvo.innerHTML=eventos.map(ev=>{const esporte=ev.esporte||'futebol';const est=estadoJogo(ev);const lista=listaGolos(ev);const tf=golosFinais(ev);const terminado=est.fase==='terminado';const oAtual=oddsDinamicas(ev);const fonteEtiqueta=ev.fonteNome?`<span class="meta-auto" style="background:#E8F0FE;border-color:#A5C5FF;color:#1A3A8F">📡 ${escapar(ev.fonteNome)}</span>`:'';return`<div class="evento-admin${terminado?' terminado':''}"><div class="evento-top"><span class="liga-badge esporte-${esporte}"><span class="sport-emoji">${ESPORTE_EMOJI[esporte]}</span>${escapar(ev.liga)}</span><span class="hora">${escapar(rotuloHora(ev.inicio))}</span></div><div class="evento-times"><div class="time">${escapar(ev.casa)}</div><div class="vs">VS</div><div class="time dir">${escapar(ev.fora)}</div></div><div class="placar-live" data-live="${ev.id}">${renderPill(est)}</div><div data-resultado="${ev.id}">${renderResultado(ev)}</div><div class="meta-admin"><span>Odd base 1: <b>${Number(ev.oddCasa).toFixed(2)}</b></span><span>Odd base 2: <b>${Number(ev.oddFora).toFixed(2)}</b></span><span class="meta-auto">⚡ Odd actual 1: <b>${oAtual.oddCasa.toFixed(2)}</b></span><span class="meta-auto">⚡ Odd actual 2: <b>${oAtual.oddFora.toFixed(2)}</b></span>${fonteEtiqueta}</div><div class="resumo-resultado"><span class="bloco">Total: <b>${tf.casa} – ${tf.fora}</b></span>${esporte==='futebol'?(lista.length?lista.map(g=>`<span class="bloco bloco-golo">⚽ ${g.minuto}' ${g.lado==='casa'?escapar(ev.casa):escapar(ev.fora)}</span>`).join(''):`<span class="bloco">Sem golos registados</span>`):`<span class="bloco">${ESPORTE_EMOJI[esporte]} ${ESPORTE_NOME[esporte]}</span>`}</div><button class="btn btn-ghost" type="button" style="margin-top:14px" data-editar="${ev.id}">Editar evento</button>${terminado?`<button class="btn-apagar-evento" type="button" data-apagar="${ev.id}">🗑️ Apagar evento terminado</button>`:''}</div>`;}).join('');alvo.querySelectorAll('[data-editar]').forEach(b=>b.addEventListener('click',()=>abrirEditorEvento(Number(b.dataset.editar))));alvo.querySelectorAll('[data-apagar]').forEach(b=>b.addEventListener('click',()=>confirmarApagarEvento(Number(b.dataset.apagar))));atualizarRelogios();}
 function confirmarApagarEvento(id){const ev=obterEventos().find(e=>e.id===id);if(!ev)return;const est=estadoJogo(ev);if(est.fase!=='terminado'){toast('Só é possível apagar eventos terminados por esta via.','erro');return;}abrirModal('Apagar evento terminado',`<div class="aposta-resumo"><small>${escapar(ev.liga)} · ${escapar(rotuloHora(ev.inicio))}</small><strong>${escapar(ev.casa)} vs ${escapar(ev.fora)}</strong></div><p class="modal-text">Tem a certeza de que deseja apagar este evento <b>definitivamente</b>?</p><button class="btn btn-ghost" id="cancelarApagarEvento" type="button">Cancelar</button><button class="btn btn-perigo" id="confirmarApagarEvento" type="button" style="margin-top:12px">🗑️ Apagar definitivamente</button>`,corpo=>{corpo.querySelector('#cancelarApagarEvento').addEventListener('click',fecharModal);corpo.querySelector('#confirmarApagarEvento').addEventListener('click',()=>{gravarEventos(obterEventos().filter(x=>x.id!==id));fecharModal();renderizarEventosAdmin();renderizarMercado();toast('Evento terminado apagado com sucesso.');});});}
 function renderizarPerfilAdmin(){const users=obterUtilizadores();const pendentes=todosOsPedidos().filter(x=>x.m.estado==='pendente').length;const saldoTotal=users.reduce((s,u)=>s+Number(u.saldo||0)+Number(u.emJogo||0),0);const totalEventos=obterEventos().filter(ev=>!eventoExpirado(ev)).length;const msgsPend=contarNaoLidasAdminTotal();const codigosAtivos=obterCodigosCadastro().filter(c=>c.ativo).length;const torneiosAtivos=contarTorneiosAtivos();const elU=$('#admTotalUsers');if(elU)elU.textContent=users.length;const elP=$('#admPendentes');if(elP)elP.textContent=pendentes;const elM=$('#admMsgsPendentes');if(elM)elM.textContent=msgsPend;const elS=$('#admSaldoTotal');if(elS)elS.textContent=kz(saldoTotal);const elE=$('#admEventosTotal');if(elE)elE.textContent=totalEventos;const elT=$('#admTorneiosAtivos');if(elT)elT.textContent=torneiosAtivos;const elC=$('#admCodigosAtivos');if(elC)elC.textContent=codigosAtivos;}
@@ -2235,12 +2336,12 @@ const btnEnviarComunicado=$('#btnEnviarComunicado');if(btnEnviarComunicado){btnE
 let FILTRO_USERS_BUSCA='';
 function renderizarUsersAdmin(){const alvo=$('#listaUsersAdmin');if(!alvo)return;const users=obterUtilizadores().slice();const filtro=FILTRO_USERS_BUSCA.trim().toLowerCase();const filtrados=filtro?users.filter(u=>u.nome.toLowerCase().includes(filtro)||u.telefone.includes(filtro.replace(/\D/g,''))||formatarTelefone(u.telefone).toLowerCase().includes(filtro)):users;if(!users.length){alvo.innerHTML=`<div class="vazio">Ainda não existem utilizadores registados.</div>`;return;}if(!filtrados.length){alvo.innerHTML=`<div class="vazio">Nenhum utilizador corresponde à busca.</div>`;return;}alvo.innerHTML=filtrados.map(u=>{const ativas=(u.apostas||[]).filter(a=>a.estado==='ativa').length;return`<div class="user-admin-card" data-user-tel="${escapar(u.telefone)}"><div class="uac-avatar">${escapar(u.nome.trim()[0].toUpperCase())}</div><div class="uac-info"><strong>${escapar(u.nome)}</strong><small>${formatarTelefone(u.telefone)} · ${ativas} aposta(s) activa(s)</small></div><div class="uac-saldo"><strong>${kz(u.saldo)}</strong><small>Saldo</small></div></div>`;}).join('');alvo.querySelectorAll('[data-user-tel]').forEach(el=>el.addEventListener('click',()=>verPerfilUserAdmin(el.dataset.userTel)));}
 const admBuscaUser=$('#admBuscaUser');if(admBuscaUser){admBuscaUser.addEventListener('input',()=>{FILTRO_USERS_BUSCA=admBuscaUser.value;renderizarUsersAdmin();});}
-function verPerfilUserAdmin(tel){const u=obterUtilizadores().find(x=>x.telefone===tel);if(!u)return;const apostas=u.apostas||[];const ativas=apostas.filter(a=>a.estado==='ativa');const ganhas=apostas.filter(a=>a.estado==='ganha');const perdidas=apostas.filter(a=>a.estado==='perdida');const totalApostado=apostas.reduce((s,a)=>s+Number(a.valor||0),0);const movs=(u.movimentos||[]).slice(0,12);const apostasHtml=apostas.length?apostas.slice(0,20).map(a=>{const desc=Array.isArray(a.selecoes)?`Múltipla · ${a.selecoes.length} selecções`:descricaoCurtaAposta(a);const cls=a.estado==='ganha'?'ganha':a.estado==='perdida'?'perdida':'ativa';const tag=a.estado==='ganha'?'Ganha':a.estado==='perdida'?'Perdida':'Activa';return`<div class="pedido" style="padding:12px 14px;margin-bottom:8px"><div class="pedido-top" style="margin-bottom:8px"><div style="flex:1;min-width:0"><strong style="font-size:13px">${Array.isArray(a.selecoes)?'Múltipla':`${escapar(a.casa)} vs ${escapar(a.fora)}`} <span class="pill ${cls}" style="font-size:9px">${tag}</span></strong><small style="font-size:11px">${desc} · odd ${Number(a.odd||a.oddTotal||1).toFixed(2)}</small></div><div class="pedido-val ${a.estado==='ganha'?'entrada':a.estado==='perdida'?'saida':''}" style="font-size:14px">${kz(a.valor)}</div></div></div>`;}).join(''):`<div class="vazio" style="padding:18px;font-size:12.5px">Sem apostas registadas.</div>`;const movsHtml=movs.length?movs.map(m=>{const sinal=m.tipo==='entrada'?'+':m.tipo==='saida'?'−':'·';const cls=m.tipo==='entrada'?'entrada':m.tipo==='saida'?'saida':'aposta';return`<div class="mov" style="padding:10px 12px"><div class="mov-info"><strong style="font-size:12.5px">${escapar(m.descricao)}</strong><small style="font-size:11px">${dataCurta(m.data)}${m.estado?' · '+m.estado:''}</small></div><div class="mov-val ${cls}" style="font-size:13px">${sinal} ${kz(m.valor)}</div></div>`;}).join(''):`<div class="vazio" style="padding:18px;font-size:12.5px">Sem movimentos registados.</div>`;const convidados=u.convidados||[];const convidadosHtml=convidados.length?convidados.map(c=>`<div class="convite-item" style="padding:8px 10px"><div><strong style="font-size:12.5px">${escapar(c.nome)}</strong><small>${formatarTelefone(c.telefone)}</small></div><span class="convite-bonus" style="font-size:11.5px">+${kz(c.bonus||0)}</span></div>`).join(''):`<div class="convite-vazio" style="margin-top:0;padding:12px;font-size:12px">Sem convidados.</div>`;abrirModal(`Perfil · ${u.nome}`,`<div class="perfil-card" style="margin:0 0 16px;padding:22px"><div class="perfil-avatar" style="width:72px;height:72px;font-size:28px;margin-bottom:12px">${escapar(u.nome.trim()[0].toUpperCase())}</div><h2 style="font-size:18px">${escapar(u.nome)}</h2><div class="tel" style="font-size:13px">${formatarTelefone(u.telefone)}</div><div class="perfil-linhas" style="margin-top:16px"><div class="linha" style="padding:10px 0;font-size:13px"><span>Membro desde</span><strong>${dataLonga(u.criadoEm)}</strong></div><div class="linha" style="padding:10px 0;font-size:13px"><span>Saldo disponível</span><strong>${kz(u.saldo)}</strong></div><div class="linha" style="padding:10px 0;font-size:13px"><span>Em jogo</span><strong>${kz(u.emJogo)}</strong></div><div class="linha" style="padding:10px 0;font-size:13px"><span>Bónus de convite</span><strong>${kz(u.bonusConvite||0)}</strong></div><div class="linha" style="padding:10px 0;font-size:13px"><span>Código de convite</span><strong>${escapar(u.codigoConvite||'—')}</strong></div>${u.banco?`<div class="linha" style="padding:10px 0;font-size:13px"><span>Banco</span><strong>${escapar(u.banco)}</strong></div>`:''}${u.iban?`<div class="linha" style="padding:10px 0;font-size:13px"><span>IBAN</span><strong style="font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all">${escapar(u.iban)}</strong></div>`:''}</div></div><div class="ajuste-saldo-box"><h4>💰 Ajustar saldo manualmente <span class="tag">ADMIN</span></h4><p class="sub">Adicione ou diminua saldo na conta deste utilizador.</p><div class="saldo-atual"><span>Saldo actual</span><strong id="admSaldoAtualValor">${kz(u.saldo)}</strong></div><div class="field"><label>Valor (Kz)</label><div class="input"><input id="admAjusteValor" type="number" min="1" step="50" placeholder="0"></div></div><div class="field"><label>Motivo / descrição (opcional)</label><div class="input"><input id="admAjusteDesc" type="text" placeholder="Ex.: Ajuste manual..." maxlength="80"></div></div><div class="grelha-2"><button class="btn btn-primary" id="admAddSaldo" type="button">➕ Adicionar</button><button class="btn btn-perigo" id="admRemoverSaldo" type="button">➖ Diminuir</button></div><button class="btn btn-ghost" id="admResetAjuste" type="button" style="margin-top:10px">Limpar campos</button></div><div class="apostas-resumo" style="grid-template-columns:repeat(3,1fr);margin-top:16px"><div><small>Activas</small><strong>${ativas.length}</strong></div><div><small>Ganhas</small><strong>${ganhas.length}</strong></div><div><small>Perdidas</small><strong>${perdidas.length}</strong></div></div><div style="font-size:12.5px;color:var(--texto-sec);text-align:center;margin-top:8px;font-weight:700">Total apostado: <b style="color:var(--verde-800)">${kz(totalApostado)}</b></div><div class="grupo-titulo" style="margin-top:22px">📊 Apostas (${apostas.length})</div>${apostasHtml}<div class="grupo-titulo">💳 Movimentos (últimos 12)</div>${movsHtml}<div class="grupo-titulo">🎁 Convidados (${convidados.length})</div>${convidadosHtml}<button class="btn btn-ghost" id="btnFecharPerfilUser" type="button" style="margin-top:16px">Fechar</button>`,corpo=>{const b=corpo.querySelector('#btnFecharPerfilUser');if(b)b.addEventListener('click',fecharModal);const inputValor=corpo.querySelector('#admAjusteValor');const inputDesc=corpo.querySelector('#admAjusteDesc');const saldoAtualEl=corpo.querySelector('#admSaldoAtualValor');const limparCampos=()=>{if(inputValor)inputValor.value='';if(inputDesc)inputDesc.value='';};corpo.querySelector('#admResetAjuste').addEventListener('click',limparCampos);const atualizarSaldoExibido=()=>{const atual=obterUtilizadores().find(x=>x.telefone===tel);if(atual&&saldoAtualEl)saldoAtualEl.textContent=kz(atual.saldo);};corpo.querySelector('#admAddSaldo').addEventListener('click',()=>{const v=parseFloat(inputValor.value);if(!v||v<=0)return toast('Introduza um valor válido.','erro');const res=ajustarSaldoUtilizador(tel,v,'add',inputDesc.value.trim());if(res.ok){toast(res.msg,'ganho');limparCampos();atualizarSaldoExibido();renderizarUsersAdmin();renderizarPerfilAdmin();}else toast(res.msg,'erro');});corpo.querySelector('#admRemoverSaldo').addEventListener('click',()=>{const v=parseFloat(inputValor.value);if(!v||v<=0)return toast('Introduza um valor válido.','erro');const res=ajustarSaldoUtilizador(tel,v,'sub',inputDesc.value.trim());if(res.ok){toast(res.msg,'ganho');limparCampos();atualizarSaldoExibido();renderizarUsersAdmin();renderizarPerfilAdmin();}else toast(res.msg,'erro');});});}
+function verPerfilUserAdmin(tel){const u=obterUtilizadores().find(x=>x.telefone===tel);if(!u)return;const apostas=u.apostas||[];const ativas=apostas.filter(a=>a.estado==='ativa');const ganhas=apostas.filter(a=>a.estado==='ganha');const perdidas=apostas.filter(a=>a.estado==='perdida');const totalApostado=apostas.reduce((s,a)=>s+Number(a.valor||0),0);const movs=(u.movimentos||[]).slice(0,12);const apostasHtml=apostas.length?apostas.slice(0,20).map(a=>{const desc=Array.isArray(a.selecoes)?`Múltipla · ${a.selecoes.length} selecções`:descricaoCurtaAposta(a);const cls=a.estado==='ganha'?'ganha':a.estado==='perdida'?'perdida':'ativa';const tag=a.estado==='ganha'?'Ganha':a.estado==='perdida'?'Perdida':'Activa';return`<div class="pedido" style="padding:12px 14px;margin-bottom:8px"><div class="pedido-top" style="margin-bottom:8px"><div style="flex:1;min-width:0"><strong style="font-size:13px">${Array.isArray(a.selecoes)?'Múltipla':`${escapar(a.casa)} vs ${escapar(a.fora)}`} <span class="pill ${cls}" style="font-size:9px">${tag}</span></strong><small style="font-size:11px">${desc} · odd ${Number(a.odd||a.oddTotal||1).toFixed(2)}</small></div><div class="pedido-val ${a.estado==='ganha'?'entrada':a.estado==='perdida'?'saida':''}" style="font-size:14px">${kz(a.valor)}</div></div></div>`;}).join(''):`<div class="vazio" style="padding:18px;font-size:12.5px">Sem apostas registadas.</div>`;const movsHtml=movs.length?movs.map(m=>{const sinal=m.tipo==='entrada'?'+':m.tipo==='saida'?'−':'·';const cls=m.tipo==='entrada'?'entrada':m.tipo==='saida'?'saida':'aposta';return`<div class="mov" style="padding:10px 12px"><div class="mov-info"><strong style="font-size:12.5px">${escapar(m.descricao)}</strong><small style="font-size:11px">${dataCurta(m.data)}${m.estado?' · '+m.estado:''}</small></div><div class="mov-val ${cls}" style="font-size:13px">${sinal} ${kz(m.valor)}</div></div>`;}).join(''):`<div class="vazio" style="padding:18px;font-size:12.5px">Sem movimentos registados.</div>`;const convidados=u.convidados||[];const convidadosHtml=convidados.length?convidados.map(c=>`<div class="convite-item" style="padding:8px 10px"><div><strong style="font-size:12.5px">${escapar(c.nome)}</strong><small>${formatarTelefone(c.telefone)}</small></div><span class="convite-bonus" style="font-size:11.5px">+${kz(c.bonus||0)}</span></div>`).join(''):`<div class="convite-vazio" style="margin-top:0;padding:12px;font-size:12px">Sem convidados.</div>`;abrirModal(`Perfil · ${u.nome}`,`<div class="perfil-card" style="margin:0 0 16px;padding:22px"><div class="perfil-avatar" style="width:72px;height:72px;font-size:28px;margin-bottom:12px">${escapar(u.nome.trim()[0].toUpperCase())}</div><h2 style="font-size:18px">${escapar(u.nome)}</h2><div class="tel" style="font-size:13px">${formatarTelefone(u.telefone)}</div><div class="perfil-linhas" style="margin-top:16px"><div class="linha" style="padding:10px 0;font-size:13px"><span>Membro desde</span><strong>${dataLonga(u.criadoEm)}</strong></div><div class="linha" style="padding:10px 0;font-size:13px"><span>Saldo disponível</span><strong>${kz(u.saldo)}</strong></div><div class="linha" style="padding:10px 0;font-size:13px"><span>Bónus bloqueado</span><strong class="bonus">${kz(u.bonusSaldo||0)}</strong></div><div class="linha" style="padding:10px 0;font-size:13px"><span>Disponível p/ levantar</span><strong>${kz(saldoDisponivelLevantamento(u))}</strong></div><div class="linha" style="padding:10px 0;font-size:13px"><span>Em jogo</span><strong>${kz(u.emJogo)}</strong></div><div class="linha" style="padding:10px 0;font-size:13px"><span>Bónus de convite</span><strong>${kz(u.bonusConvite||0)}</strong></div><div class="linha" style="padding:10px 0;font-size:13px"><span>Código de convite</span><strong>${escapar(u.codigoConvite||'—')}</strong></div>${u.banco?`<div class="linha" style="padding:10px 0;font-size:13px"><span>Banco</span><strong>${escapar(u.banco)}</strong></div>`:''}${u.iban?`<div class="linha" style="padding:10px 0;font-size:13px"><span>IBAN</span><strong style="font-family:ui-monospace,Menlo,monospace;font-size:12px;word-break:break-all">${escapar(u.iban)}</strong></div>`:''}</div></div><div class="ajuste-saldo-box"><h4>💰 Ajustar saldo manualmente <span class="tag">ADMIN</span></h4><p class="sub">Adicione ou diminua saldo na conta deste utilizador. <b>Nota:</b> os ajustes manuais do admin são considerados saldo real (levantável) e não mexem no bónus bloqueado.</p><div class="saldo-atual"><span>Saldo actual</span><strong id="admSaldoAtualValor">${kz(u.saldo)}</strong></div><div class="field"><label>Valor (Kz)</label><div class="input"><input id="admAjusteValor" type="number" min="1" step="50" placeholder="0"></div></div><div class="field"><label>Motivo / descrição (opcional)</label><div class="input"><input id="admAjusteDesc" type="text" placeholder="Ex.: Ajuste manual..." maxlength="80"></div></div><div class="grelha-2"><button class="btn btn-primary" id="admAddSaldo" type="button">➕ Adicionar</button><button class="btn btn-perigo" id="admRemoverSaldo" type="button">➖ Diminuir</button></div><button class="btn btn-ghost" id="admResetAjuste" type="button" style="margin-top:10px">Limpar campos</button></div><div class="apostas-resumo" style="grid-template-columns:repeat(3,1fr);margin-top:16px"><div><small>Activas</small><strong>${ativas.length}</strong></div><div><small>Ganhas</small><strong>${ganhas.length}</strong></div><div><small>Perdidas</small><strong>${perdidas.length}</strong></div></div><div style="font-size:12.5px;color:var(--texto-sec);text-align:center;margin-top:8px;font-weight:700">Total apostado: <b style="color:var(--verde-800)">${kz(totalApostado)}</b></div><div class="grupo-titulo" style="margin-top:22px">📊 Apostas (${apostas.length})</div>${apostasHtml}<div class="grupo-titulo">💳 Movimentos (últimos 12)</div>${movsHtml}<div class="grupo-titulo">🎁 Convidados (${convidados.length})</div>${convidadosHtml}<button class="btn btn-ghost" id="btnFecharPerfilUser" type="button" style="margin-top:16px">Fechar</button>`,corpo=>{const b=corpo.querySelector('#btnFecharPerfilUser');if(b)b.addEventListener('click',fecharModal);const inputValor=corpo.querySelector('#admAjusteValor');const inputDesc=corpo.querySelector('#admAjusteDesc');const saldoAtualEl=corpo.querySelector('#admSaldoAtualValor');const limparCampos=()=>{if(inputValor)inputValor.value='';if(inputDesc)inputDesc.value='';};corpo.querySelector('#admResetAjuste').addEventListener('click',limparCampos);const atualizarSaldoExibido=()=>{const atual=obterUtilizadores().find(x=>x.telefone===tel);if(atual&&saldoAtualEl)saldoAtualEl.textContent=kz(atual.saldo);};corpo.querySelector('#admAddSaldo').addEventListener('click',()=>{const v=parseFloat(inputValor.value);if(!v||v<=0)return toast('Introduza um valor válido.','erro');const res=ajustarSaldoUtilizador(tel,v,'add',inputDesc.value.trim());if(res.ok){toast(res.msg,'ganho');limparCampos();atualizarSaldoExibido();renderizarUsersAdmin();renderizarPerfilAdmin();}else toast(res.msg,'erro');});corpo.querySelector('#admRemoverSaldo').addEventListener('click',()=>{const v=parseFloat(inputValor.value);if(!v||v<=0)return toast('Introduza um valor válido.','erro');const res=ajustarSaldoUtilizador(tel,v,'sub',inputDesc.value.trim());if(res.ok){toast(res.msg,'ganho');limparCampos();atualizarSaldoExibido();renderizarUsersAdmin();renderizarPerfilAdmin();}else toast(res.msg,'erro');});});}
 
 function formatarIbanInput(v){const limpo=String(v||'').toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,30);return limpo.replace(/(.{4})/g,'$1 ').trim();}
 (function ligarDadosBancarios(){const inputIban=$('#dadosIban');if(inputIban){inputIban.addEventListener('input',()=>{const pos=inputIban.selectionStart,antes=inputIban.value.length;inputIban.value=formatarIbanInput(inputIban.value);const dif=inputIban.value.length-antes;inputIban.setSelectionRange(Math.max(0,pos+dif),Math.max(0,pos+dif));});}const btn=$('#btnGuardarDadosBancarios');if(!btn)return;btn.addEventListener('click',()=>{const u=utilizadorAtual();if(!u)return;const banco=$('#dadosBanco').value.trim();const ibanBruto=$('#dadosIban').value.trim().toUpperCase();const iban=ibanBruto.replace(/\s+/g,'');if(!banco||banco.length<2)return toast('Introduza o nome do banco.','erro');if(banco.length>60)return toast('O nome do banco é demasiado longo.','erro');if(!iban||iban.length<15||iban.length>34)return toast('Introduza um IBAN válido (entre 15 e 34 caracteres).','erro');if(!/^[A-Z]{2}[0-9A-Z]+$/.test(iban))return toast('IBAN inválido. Comece pelas letras do país, ex.: AO06…','erro');u.banco=banco;u.iban=ibanBruto;atualizarUtilizador(u);renderizarTudo();toast('Dados bancários guardados com sucesso.','ganho');});})();
 
-(function ligarAcoesConvite(){const btnCopiar=$('#btnCopiarCodigo');const btnPartilhar=$('#btnPartilharCodigo');const btnCopiarRec=$('#btnCopiarCodigoRecuperacao');if(btnCopiar){btnCopiar.addEventListener('click',async()=>{const u=utilizadorAtual();if(!u||!u.codigoConvite){toast('Código indisponível.','erro');return;}const ok=await copiarParaClipboard(u.codigoConvite);if(ok)toast('Código copiado! Cole onde quiser.','ganho');else toast('Não foi possível copiar.','erro');});}if(btnCopiarRec){btnCopiarRec.addEventListener('click',async()=>{const u=utilizadorAtual();if(!u||!u.codigoRecuperacao){toast('Código indisponível.','erro');return;}const ok=await copiarParaClipboard(u.codigoRecuperacao);if(ok)toast('Código de recuperação copiado!','ganho');else toast('Código: '+u.codigoRecuperacao,'ok');});}if(btnPartilhar){btnPartilhar.addEventListener('click',async()=>{const u=utilizadorAtual();if(!u||!u.codigoConvite){toast('Código indisponível.','erro');return;}const cfg=obterConfig();const texto=`🎁 Junte-se à FREEPREMIER!\n\nUse o meu código de convite: ${u.codigoConvite}\nAo registar-se com ele e fazer depósitos, eu ganho ${cfg.bonusConvite}% de bónus por cada depósito aprovado.\n\nSem casa de apostas, sem intermediários.`;if(navigator.share){try{await navigator.share({title:'FREEPREMIER',text:texto});return;}catch(_){}}const ok=await copiarParaClipboard(texto);if(ok)toast('Texto de convite copiado!','ganho');else toast('Código: '+u.codigoConvite,'ganho');});}})();
+(function ligarAcoesConvite(){const btnCopiar=$('#btnCopiarCodigo');const btnPartilhar=$('#btnPartilharCodigo');const btnCopiarRec=$('#btnCopiarCodigoRecuperacao');if(btnCopiar){btnCopiar.addEventListener('click',async()=>{const u=utilizadorAtual();if(!u||!u.codigoConvite){toast('Código indisponível.','erro');return;}const ok=await copiarParaClipboard(u.codigoConvite);if(ok)toast('Código copiado! Cole onde quiser.','ganho');else toast('Não foi possível copiar.','erro');});}if(btnCopiarRec){btnCopiarRec.addEventListener('click',async()=>{const u=utilizadorAtual();if(!u||!u.codigoRecuperacao){toast('Código indisponível.','erro');return;}const ok=await copiarParaClipboard(u.codigoRecuperacao);if(ok)toast('Código de recuperação copiado!','ganho');else toast('Código: '+u.codigoRecuperacao,'ok');});}if(btnPartilhar){btnPartilhar.addEventListener('click',async()=>{const u=utilizadorAtual();if(!u||!u.codigoConvite){toast('Código indisponível.','erro');return;}const cfg=obterConfig();const texto=`🎁 Junte-se à FREEPREMIER!\n\nUse o meu código de convite: ${u.codigoConvite}\nAo registar-se com ele e fazer depósitos, eu ganho ${cfg.bonusConvite}% de bónus por cada depósito aprovado (o bónus só pode ser levantado após ser apostado).\n\nSem casa de apostas, sem intermediários.`;if(navigator.share){try{await navigator.share({title:'FREEPREMIER',texto:texto});return;}catch(_){}}const ok=await copiarParaClipboard(texto);if(ok)toast('Texto de convite copiado!','ganho');else toast('Código: '+u.codigoConvite,'ganho');});}})();
 
 const btnNovoEvento=$('#btnNovoEvento');if(btnNovoEvento)btnNovoEvento.addEventListener('click',()=>abrirEditorEvento(null));
 function abrirEditorEvento(id){const eventos=obterEventos();const existente=id?eventos.find(e=>e.id===id):null;const novo=!existente;const e=existente||{liga:'',casa:'',fora:'',inicio:new Date(Date.now()+30*60000).toISOString(),oddCasa:1.90,oddFora:1.90,golosLista:[]};const listaGolosEdit=(Array.isArray(e.golosLista)?e.golosLista:converterGolosAntigos(e)).map(g=>({lado:g.lado,minuto:Number(g.minuto)||1}));abrirModal(novo?'Criar novo evento':'Editar evento',`<div class="dep-info-box" style="margin-bottom:16px"><span class="dep-titulo">🕐 Hora local do dispositivo</span><div class="dep-item" style="border:none"><span>Hora actual</span><b>${agoraLocalTexto()}</b></div></div><div class="field"><label>Liga / Competição</label><div class="input"><input id="edLiga" type="text" value="${escapar(e.liga)}" placeholder="Ex.: Girabola"></div></div><div class="field"><label>Equipa da casa</label><div class="input"><input id="edCasa" type="text" value="${escapar(e.casa)}" placeholder="Ex.: Petro de Luanda"></div></div><div class="field"><label>Equipa visitante</label><div class="input"><input id="edFora" type="text" value="${escapar(e.fora)}" placeholder="Ex.: Primeiro de Agosto"></div></div><div class="field"><label>Início do jogo (hora local)</label><div class="input"><input id="edInicio" type="datetime-local" value="${paraInputDatetime(e.inicio)}"></div></div><div class="chips-mini"><button class="chip-mini" type="button" data-offset="-30">Começou há 30 min</button><button class="chip-mini" type="button" data-offset="-70">Há 70 min (2ª parte)</button><button class="chip-mini" type="button" data-offset="0">Agora</button><button class="chip-mini" type="button" data-offset="30">Em 30 min</button><button class="chip-mini" type="button" data-offset="120">Em 2 horas</button></div><p class="modal-text" style="margin-top:-4px">⏱️ Cronómetro automático: <b>1ª parte (1'–45')</b> → <b>intervalo de 15 min</b> → <b>2ª parte (46'–90')</b>. Eventos terminados desaparecem após <b>30 segundos</b>.</p><div class="bloco-resultado"><h4>⚽ Golos e minutos exactos <span class="tag">1–90'</span></h4><p class="modal-text" style="margin:0 0 12px;font-size:12.5px">Adicione cada golo com o minuto exacto (1 a 90).</p><div id="listaGolosEditor" class="golos-editor"></div><button type="button" class="chip-mini" id="btnAddGolo" style="margin-top:6px">+ Adicionar golo</button></div><div class="grelha-2"><div class="field"><label>Odd base casa (1)</label><div class="input"><input id="edOddCasa" type="number" min="1.01" step="0.01" value="${Number(e.oddCasa).toFixed(2)}"></div></div><div class="field"><label>Odd base fora (2)</label><div class="input"><input id="edOddFora" type="number" min="1.01" step="0.01" value="${Number(e.oddFora).toFixed(2)}"></div></div></div><button class="btn btn-primary" id="guardarEvento" type="button">${novo?'Criar evento':'Guardar alterações'}</button>${novo?'':'<button class="btn btn-ghost" id="apagarEvento" type="button" style="margin-top:12px">Apagar evento</button>'}`,corpo=>{corpo.querySelectorAll('[data-offset]').forEach(b=>{b.addEventListener('click',()=>{const off=Number(b.dataset.offset);const d=new Date(Date.now()+off*60000);corpo.querySelector('#edInicio').value=paraInputDatetime(d.toISOString());});});function renderGolosEditor(){const el=corpo.querySelector('#listaGolosEditor');const nomeCasa=corpo.querySelector('#edCasa').value.trim()||'Casa';const nomeFora=corpo.querySelector('#edFora').value.trim()||'Fora';if(!listaGolosEdit.length){el.innerHTML=`<p style="font-size:12.5px;color:#5A7A5A;padding:8px 4px">Nenhum golo registado. O jogo pode terminar 0 – 0.</p>`;return;}const comIdx=listaGolosEdit.map((g,i)=>({...g,_i:i}));comIdx.sort((a,b)=>a.minuto-b.minuto);el.innerHTML=comIdx.map(g=>`<div class="golo-row"><input class="golo-min" type="number" min="1" max="90" step="1" value="${g.minuto}" data-i="${g._i}"><span class="golo-apos">'</span><select class="golo-lado" data-i="${g._i}"><option value="casa" ${g.lado==='casa'?'selected':''}>${escapar(nomeCasa)}</option><option value="fora" ${g.lado==='fora'?'selected':''}>${escapar(nomeFora)}</option></select><button type="button" class="golo-remover" data-i="${g._i}" title="Remover">✕</button></div>`).join('');el.querySelectorAll('.golo-min').forEach(inp=>{inp.addEventListener('input',()=>{const i=Number(inp.dataset.i);let v=parseInt(inp.value,10);if(isNaN(v))v=1;v=Math.max(1,Math.min(90,v));listaGolosEdit[i].minuto=v;});inp.addEventListener('blur',()=>{const i=Number(inp.dataset.i);inp.value=listaGolosEdit[i].minuto;renderGolosEditor();});});el.querySelectorAll('.golo-lado').forEach(sel=>sel.addEventListener('change',()=>{listaGolosEdit[Number(sel.dataset.i)].lado=sel.value;}));el.querySelectorAll('.golo-remover').forEach(b=>b.addEventListener('click',()=>{listaGolosEdit.splice(Number(b.dataset.i),1);renderGolosEditor();}));}renderGolosEditor();corpo.querySelector('#edCasa').addEventListener('input',renderGolosEditor);corpo.querySelector('#edFora').addEventListener('input',renderGolosEditor);corpo.querySelector('#btnAddGolo').addEventListener('click',()=>{if(listaGolosEdit.length>=60){toast('Máximo de 60 golos.','erro');return;}const proximoMin=listaGolosEdit.length?Math.min(90,Math.max(...listaGolosEdit.map(g=>g.minuto))+5):10;listaGolosEdit.push({lado:'casa',minuto:Math.max(1,proximoMin)});renderGolosEditor();});corpo.querySelector('#guardarEvento').addEventListener('click',()=>{const liga=corpo.querySelector('#edLiga').value.trim();const casa=corpo.querySelector('#edCasa').value.trim();const fora=corpo.querySelector('#edFora').value.trim();const inicioStr=corpo.querySelector('#edInicio').value;const oddCasa=parseFloat(corpo.querySelector('#edOddCasa').value);const oddFora=parseFloat(corpo.querySelector('#edOddFora').value);if(!liga||!casa||!fora)return toast('Preencha liga, equipa da casa e visitante.','erro');if(!inicioStr)return toast('Defina a data e hora de início.','erro');const inicioData=inputDatetimeParaLocal(inicioStr);if(!inicioData||isNaN(inicioData.getTime()))return toast('Data/hora inválida.','erro');if(!(oddCasa>1)||!(oddFora>1))return toast('As odds devem ser maiores que 1.00.','erro');for(const g of listaGolosEdit){if(!(g.minuto>=1&&g.minuto<=90))return toast('Cada golo deve ter um minuto entre 1 e 90.','erro');if(g.lado!=='casa'&&g.lado!=='fora')return toast('Cada golo deve estar associado a uma equipa.','erro');}const golosListaFinal=listaGolosEdit.map(g=>({lado:g.lado,minuto:Number(g.minuto)})).sort((a,b)=>a.minuto-b.minuto);const lista=obterEventos().slice();const dados={liga,casa,fora,esporte:'futebol',inicio:inicioData.toISOString(),oddCasa,oddFora,golosLista:golosListaFinal};if(novo)lista.push({id:Date.now(),criadoPorAdmin:true,...dados});else{const i=lista.findIndex(x=>x.id===id);if(i>-1)lista[i]={...lista[i],...dados,criadoPorAdmin:true};}gravarEventos(lista);fecharModal();liquidarApostas({silencioso:true});renderizarEventosAdmin();renderizarMercado();renderizarApostas();renderizarPerfilAdmin();toast(novo?'Evento criado com sucesso.':'Evento actualizado com sucesso.');});const btnApagar=corpo.querySelector('#apagarEvento');if(btnApagar){btnApagar.addEventListener('click',()=>{gravarEventos(obterEventos().filter(x=>x.id!==id));fecharModal();renderizarEventosAdmin();renderizarMercado();renderizarApostas();toast('Evento apagado.');});}});}
@@ -2253,9 +2354,114 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharModal();});
 
 $('#btnDepositar').addEventListener('click',()=>{const info=obterDepositoInfo();const cfg=obterConfig();const temAlgum=info.iban||info.paypalEntidade||info.paypalReferencia;const infoHtml=temAlgum?`<div class="dep-info-box"><span class="dep-titulo">💳 Dados para pagamento</span>${info.iban?`<div class="dep-item"><span>IBAN</span><b>${escapar(info.iban)}</b></div>`:''}${info.paypalEntidade?`<div class="dep-item"><span>Entidade PayPal</span><b>${escapar(info.paypalEntidade)}</b></div>`:''}${info.paypalReferencia?`<div class="dep-item"><span>Referência PayPal</span><b>${escapar(info.paypalReferencia)}</b></div>`:''}</div>`:`<div class="dep-vazio">⚠️ Os dados de depósito ainda não foram configurados pelo administrador.</div>`;abrirModal('Depositar e enviar comprovativo',`${infoHtml}<p class="modal-text">Escolha um valor rápido ou introduza outro. O valor <b>mínimo</b> é <b>${kz(cfg.minDeposito)}</b>. Após confirmar, será <b>redireccionado para o email da equipa</b> para anexar o comprovativo.</p><div class="chips">${[1000,5000,10000,25000].map(v=>`<button class="chip" type="button" data-valor="${v}">${v.toLocaleString('pt-PT')} Kz</button>`).join('')}</div><div class="field"><label>Valor (Kz)</label><div class="input"><input id="valorDep" type="number" min="${cfg.minDeposito}" step="100" placeholder="0"></div></div><p class="modal-text" style="margin-top:-6px;font-size:12.5px">📎 <b>Atenção:</b> Digite quanto deseja depositar e clique no botão abaixo <b>${EMAIL_COMPROVATIVO}</b>.</p><button class="btn btn-primary" id="confirmarDep" type="button">Enviar comprovativo por email</button>`,corpo=>{corpo.querySelectorAll('.chip').forEach(c=>c.addEventListener('click',()=>{corpo.querySelector('#valorDep').value=c.dataset.valor;}));corpo.querySelector('#confirmarDep').addEventListener('click',()=>{const v=parseFloat(corpo.querySelector('#valorDep').value);const cfgAtual=obterConfig();if(!v||v<=0)return toast('Introduza um valor válido.','erro');if(v<cfgAtual.minDeposito)return toast(`O valor mínimo de depósito é ${kz(cfgAtual.minDeposito)}.`,'erro');const u=utilizadorAtual();if(!u)return;const dataAtual=new Date();const dataFormatada=`${dataCurta(dataAtual.toISOString())} (hora local)`;u.movimentos=u.movimentos||[];u.movimentos.unshift({id:novoId(),descricao:'Pedido de depósito (comprovativo por email)',valor:v,tipo:'entrada',estado:'pendente',data:dataAtual.toISOString()});u.movimentos=u.movimentos.slice(0,40);atualizarUtilizador(u);const depInfo=obterDepositoInfo();let blocoInfo='';if(depInfo.iban)blocoInfo+=`IBAN: ${depInfo.iban}\n`;if(depInfo.paypalEntidade)blocoInfo+=`Entidade PayPal: ${depInfo.paypalEntidade}\n`;if(depInfo.paypalReferencia)blocoInfo+=`Referência PayPal: ${depInfo.paypalReferencia}\n`;const assunto=`Depósito FREEPREMIER · ${u.nome} · ${kz(v)}`;const corpoEmail=`Olá, equipa FREEPREMIER,\n\nSegue abaixo os dados do meu depósito:\n\nNome completo: ${u.nome}\nNúmero de telemóvel: ${formatarTelefone(u.telefone)}\nData do pedido (hora local): ${dataFormatada}\nValor a depositar: ${kz(v)}\n${blocoInfo?`\nDados de pagamento usados:\n${blocoInfo}`:''}\nvou Anexar a imagem do comprovativo de pagamento a este email.\n\nai esta o comprovativo.\n\nObrigado.`;const mailto=`mailto:${EMAIL_COMPROVATIVO}?subject=${encodeURIComponent(assunto)}&body=${encodeURIComponent(corpoEmail)}`;fecharModal();renderizarTudo();try{window.location.href=mailto;}catch(err){window.open(mailto,'_blank');}toast('Pedido registado. Envie o comprovativo no email aberto.','ganho');});});});
 
-$('#btnLevantar').addEventListener('click',()=>{const u=utilizadorAtual();if(!u)return;const cfg=obterConfig();const disponivel=saldoDisponivel(u);const temBanco=!!(u.banco&&u.banco.trim());const temIban=!!(u.iban&&u.iban.trim());if(!temBanco||!temIban){abrirModal('Dados bancários necessários',`<div class="dep-vazio" style="margin-bottom:16px">⚠️ Para fazer um levantamento, precisa primeiro de guardar o <b>nome do banco</b> e o <b>IBAN</b> na sua conta.</div><p class="modal-text">Estes dados são usados pela plataforma para transferir o seu dinheiro.</p><button class="btn btn-primary" id="btnIrConfigurarDados" type="button">🏦 Configurar dados bancários agora</button><button class="btn btn-ghost" id="btnCancelarDados" type="button" style="margin-top:12px">Cancelar</button>`,corpo=>{corpo.querySelector('#btnCancelarDados').addEventListener('click',fecharModal);corpo.querySelector('#btnIrConfigurarDados').addEventListener('click',()=>{fecharModal();irPara('perfil');setTimeout(()=>{const alvo=$('#bancoBox');if(alvo)alvo.scrollIntoView({behavior:'smooth',block:'center'});const inp=$('#dadosBanco');if(inp)setTimeout(()=>inp.focus(),400);},350);toast('Preencha os dados bancários e volte a tentar o levantamento.');});});return;}abrirModal('Levantar saldo',`<p class="modal-text">Saldo disponível para levantamento: <strong>${kz(disponivel)}</strong><br>O valor <b>mínimo</b> de levantamento é <b>${kz(cfg.minLevantamento)}</b>.</p><div class="dep-info-box"><span class="dep-titulo">🏦 Destinatário da transferência</span><div class="dep-item"><span>Banco</span><b>${escapar(u.banco)}</b></div><div class="dep-item"><span>IBAN</span><b>${escapar(u.iban)}</b></div></div><div class="field"><label>Valor a levantar (Kz)</label><div class="input"><input id="valorLev" type="number" min="${cfg.minLevantamento}" step="100" placeholder="0"></div></div><button class="btn btn-primary" id="confirmarLev" type="button">Enviar pedido de levantamento</button><button class="btn btn-ghost" id="editarDadosBancarios" type="button" style="margin-top:12px">✏️ Editar dados bancários</button>`,corpo=>{corpo.querySelector('#editarDadosBancarios').addEventListener('click',()=>{fecharModal();irPara('perfil');setTimeout(()=>{const alvo=$('#bancoBox');if(alvo)alvo.scrollIntoView({behavior:'smooth',block:'center'});},350);});corpo.querySelector('#confirmarLev').addEventListener('click',()=>{const v=parseFloat(corpo.querySelector('#valorLev').value);const cfgAtual=obterConfig();if(!v||v<=0)return toast('Introduza um valor válido.','erro');if(v<cfgAtual.minLevantamento)return toast(`O valor mínimo de levantamento é ${kz(cfgAtual.minLevantamento)}.`,'erro');const atual=utilizadorAtual();if(!atual.banco||!atual.iban)return toast('Configure primeiro os dados bancários.','erro');if(v>saldoDisponivel(atual))return toast('Saldo insuficiente para este levantamento.','erro');atual.movimentos.unshift({id:novoId(),descricao:'Pedido de levantamento',valor:v,tipo:'saida',estado:'pendente',banco:atual.banco,iban:atual.iban,data:new Date().toISOString()});atual.movimentos=atual.movimentos.slice(0,40);atualizarUtilizador(atual);fecharModal();renderizarTudo();toast('Seu pedido de levantamento já esta em processamento.');});});});
+/* ⚠️ LEVANTAMENTO: agora bloqueia bónus não apostado */
+$('#btnLevantar').addEventListener('click',()=>{
+  const u=utilizadorAtual();if(!u)return;
+  const cfg=obterConfig();
+  const disponivel=saldoDisponivelLevantamento(u); // ⚠️ exclui bónus
+  const disponivelTotal=saldoDisponivel(u);
+  const bonusBloq=Number(u.bonusSaldo||0);
+  const temBanco=!!(u.banco&&u.banco.trim());
+  const temIban=!!(u.iban&&u.iban.trim());
+  if(!temBanco||!temIban){
+    abrirModal('Dados bancários necessários',`<div class="dep-vazio" style="margin-bottom:16px">⚠️ Para fazer um levantamento, precisa primeiro de guardar o <b>nome do banco</b> e o <b>IBAN</b> na sua conta.</div><p class="modal-text">Estes dados são usados pela plataforma para transferir o seu dinheiro.</p><button class="btn btn-primary" id="btnIrConfigurarDados" type="button">🏦 Configurar dados bancários agora</button><button class="btn btn-ghost" id="btnCancelarDados" type="button" style="margin-top:12px">Cancelar</button>`,corpo=>{corpo.querySelector('#btnCancelarDados').addEventListener('click',fecharModal);corpo.querySelector('#btnIrConfigurarDados').addEventListener('click',()=>{fecharModal();irPara('perfil');setTimeout(()=>{const alvo=$('#bancoBox');if(alvo)alvo.scrollIntoView({behavior:'smooth',block:'center'});const inp=$('#dadosBanco');if(inp)setTimeout(()=>inp.focus(),400);},350);toast('Preencha os dados bancários e volte a tentar o levantamento.');});});
+    return;
+  }
+  const avisoBonusHtml = bonusBloq>0
+    ? `<div class="dep-vazio" style="margin-bottom:12px;background:linear-gradient(135deg, rgba(255,179,0,.1), rgba(255,109,0,.05));border-color:rgba(255,179,0,.35);color:#5D4300">🎁 Tem <b>${kz(bonusBloq)}</b> em bónus bloqueado. Este valor só poderá ser levantado após ser apostado pelo menos uma vez.</div>`
+    : '';
+  abrirModal('Levantar saldo',`
+    <p class="modal-text">Saldo disponível para levantamento: <strong>${kz(disponivel)}</strong><br>
+    Saldo total (com bónus): ${kz(disponivelTotal)}<br>
+    O valor <b>mínimo</b> de levantamento é <b>${kz(cfg.minLevantamento)}</b>.</p>
+    ${avisoBonusHtml}
+    <div class="dep-info-box"><span class="dep-titulo">🏦 Destinatário da transferência</span>
+      <div class="dep-item"><span>Banco</span><b>${escapar(u.banco)}</b></div>
+      <div class="dep-item"><span>IBAN</span><b>${escapar(u.iban)}</b></div>
+    </div>
+    <div class="field"><label>Valor a levantar (Kz)</label><div class="input"><input id="valorLev" type="number" min="${cfg.minLevantamento}" step="100" placeholder="0"></div></div>
+    <button class="btn btn-primary" id="confirmarLev" type="button">Enviar pedido de levantamento</button>
+    <button class="btn btn-ghost" id="editarDadosBancarios" type="button" style="margin-top:12px">✏️ Editar dados bancários</button>
+  `,corpo=>{
+    corpo.querySelector('#editarDadosBancarios').addEventListener('click',()=>{fecharModal();irPara('perfil');setTimeout(()=>{const alvo=$('#bancoBox');if(alvo)alvo.scrollIntoView({behavior:'smooth',block:'center'});},350);});
+    corpo.querySelector('#confirmarLev').addEventListener('click',()=>{
+      const v=parseFloat(corpo.querySelector('#valorLev').value);
+      const cfgAtual=obterConfig();
+      if(!v||v<=0)return toast('Introduza um valor válido.','erro');
+      if(v<cfgAtual.minLevantamento)return toast(`O valor mínimo de levantamento é ${kz(cfgAtual.minLevantamento)}.`,'erro');
+      const atual=utilizadorAtual();
+      if(!atual.banco||!atual.iban)return toast('Configure primeiro os dados bancários.','erro');
+      if(v>saldoDisponivelLevantamento(atual)){
+        if(v<=saldoDisponivel(atual) && atual.bonusSaldo>0){
+          return toast(`O bônus é usado para apostar antes de ser levantado. Disponível para levantar: ${kz(saldoDisponivelLevantamento(atual))}.`,'erro');
+        }
+        return toast('Saldo insuficiente para este levantamento.','erro');
+      }
+      atual.movimentos.unshift({id:novoId(),descricao:'Pedido de levantamento',valor:v,tipo:'saida',estado:'pendente',banco:atual.banco,iban:atual.iban,data:new Date().toISOString()});
+      atual.movimentos=atual.movimentos.slice(0,40);
+      atualizarUtilizador(atual);
+      fecharModal();renderizarTudo();
+      toast('Seu pedido de levantamento já esta em processamento.');
+    });
+  });
+});
 
-function abrirBoletim(){const lista=obterBoletim();if(!lista.length){toast('O boletim está vazio.','erro');return;}const u=utilizadorAtual();if(!u)return;const cfg=obterConfig();const disponivel=saldoDisponivel(u);const oddTotal=lista.reduce((p,s)=>p*Number(s.odd),1);const html=`<p class="modal-text">Aposta múltipla · <b>${lista.length}</b> de ${MAX_SELECOES} selecções.<br>Saldo disponível: <b>${kz(disponivel)}</b></p><div class="boletim-lista">${lista.map(s=>`<div class="boletim-item"><div class="boletim-info"><strong>${escapar(s.casa)} vs ${escapar(s.fora)}</strong><small>${escapar(s.liga)} · ${descricaoMercadoBoletim(s)}</small></div><div class="boletim-odd">${Number(s.odd).toFixed(2)}</div><button class="boletim-remover" type="button" data-remover="${chaveSelecao(s)}" title="Remover">✕</button></div>`).join('')}</div><div class="boletim-total"><span>Odd total</span><strong>${oddTotal.toFixed(2)}</strong></div><div class="field"><label>Valor da aposta (Kz)</label><div class="input"><input id="valorMultipla" type="number" min="${cfg.minDeposito}" step="100" placeholder="0"></div></div><div class="boletim-potencial" id="potencialMultipla">Retorno potencial: 0,00 Kz</div><button class="btn btn-primary" id="confirmarMultipla" type="button">Confirmar aposta múltipla</button><button class="btn btn-ghost" id="limparBoletim" type="button" style="margin-top:12px">Limpar boletim</button>`;abrirModal('Boletim de apostas',html,corpo=>{corpo.querySelectorAll('[data-remover]').forEach(b=>{b.addEventListener('click',()=>{const chave=b.dataset.remover;const nova=obterBoletim().filter(s=>chaveSelecao(s)!==chave);gravarBoletim(nova);if(nova.length)abrirBoletim();else{fecharModal();renderizarMercado();}});});const inputV=corpo.querySelector('#valorMultipla');const potEl=corpo.querySelector('#potencialMultipla');inputV.addEventListener('input',()=>{const v=parseFloat(inputV.value)||0;potEl.textContent=`Retorno potencial: ${kz(v*oddTotal)}`;});corpo.querySelector('#confirmarMultipla').addEventListener('click',()=>{const v=parseFloat(inputV.value);if(!v||v<=0)return toast('Introduza um valor válido.','erro');if(v<100)return toast(`A aposta mínima é ${kz(100)}.`,'erro');const sel=obterBoletim();if(!sel.length)return toast('O boletim está vazio.','erro');if(sel.length>MAX_SELECOES)return toast(`Máximo de ${MAX_SELECOES} selecções.`,'erro');const atual=utilizadorAtual();if(v>saldoDisponivel(atual))return toast('Saldo insuficiente. Deposite primeiro.','erro');const eventos=obterEventos();const evMap=new Map(eventos.map(e=>[e.id,e]));for(const s of sel){const ev=evMap.get(s.eventoId);if(!ev||estadoJogo(ev).fase==='terminado')return toast('Uma das selecções já terminou. Actualize o boletim.','erro');}const oddTotalFinal=sel.reduce((p,s)=>p*Number(s.odd),1);atual.saldo-=v;atual.emJogo+=v;atual.movimentos.unshift({id:novoId(),descricao:`Aposta múltipla · ${sel.length} selecções (odd ${oddTotalFinal.toFixed(2)})`,valor:v,tipo:'aposta',estado:'aprovado',data:new Date().toISOString()});atual.movimentos=atual.movimentos.slice(0,40);if(!Array.isArray(atual.apostas))atual.apostas=[];atual.apostas.unshift({id:novoId(),tipo:'multipla',selecoes:sel.map(s=>({...s})),valor:v,oddTotal:oddTotalFinal,estado:'ativa',premio:0,data:new Date().toISOString()});atual.apostas=atual.apostas.slice(0,200);atualizarUtilizador(atual);gravarBoletim([]);fecharModal();renderizarTudo();toast(`Aposta múltipla de ${kz(v)} registada · odd total ${oddTotalFinal.toFixed(2)}`);});corpo.querySelector('#limparBoletim').addEventListener('click',()=>{gravarBoletim([]);fecharModal();renderizarMercado();toast('Boletim limpo.');});});}
+/* ⚠️ Ao confirmar aposta, reduz o "bonusSaldo" pelo valor apostado (cumpre o requisito) */
+function abrirBoletim(){
+  const lista=obterBoletim();
+  if(!lista.length){toast('O boletim está vazio.','erro');return;}
+  const u=utilizadorAtual();if(!u)return;
+  const cfg=obterConfig();
+  const disponivel=saldoDisponivel(u);
+  const oddTotal=lista.reduce((p,s)=>p*Number(s.odd),1);
+  const bonusAtual=Number(u.bonusSaldo||0);
+  const avisoBonus = bonusAtual>0
+    ? `<div class="boletim-potencial" style="background:#FFF8E1;border-color:#FFE082;color:#8D6E00">🎁 Tem <b>${kz(bonusAtual)}</b> em bónus bloqueado. <b>Ao apostar, este bónus é desbloqueado automaticamente na proporção do valor apostado.</b></div>`
+    : '';
+  const html=`<p class="modal-text">Aposta múltipla · <b>${lista.length}</b> de ${MAX_SELECOES} selecções.<br>Saldo disponível: <b>${kz(disponivel)}</b></p>${avisoBonus}<div class="boletim-lista">${lista.map(s=>`<div class="boletim-item"><div class="boletim-info"><strong>${escapar(s.casa)} vs ${escapar(s.fora)}</strong><small>${escapar(s.liga)} · ${descricaoMercadoBoletim(s)}</small></div><div class="boletim-odd">${Number(s.odd).toFixed(2)}</div><button class="boletim-remover" type="button" data-remover="${chaveSelecao(s)}" title="Remover">✕</button></div>`).join('')}</div><div class="boletim-total"><span>Odd total</span><strong>${oddTotal.toFixed(2)}</strong></div><div class="field"><label>Valor da aposta (Kz)</label><div class="input"><input id="valorMultipla" type="number" min="${cfg.minDeposito}" step="100" placeholder="0"></div></div><div class="boletim-potencial" id="potencialMultipla">Retorno potencial: 0,00 Kz</div><button class="btn btn-primary" id="confirmarMultipla" type="button">Confirmar aposta múltipla</button><button class="btn btn-ghost" id="limparBoletim" type="button" style="margin-top:12px">Limpar boletim</button>`;
+  abrirModal('Boletim de apostas',html,corpo=>{
+    corpo.querySelectorAll('[data-remover]').forEach(b=>{b.addEventListener('click',()=>{const chave=b.dataset.remover;const nova=obterBoletim().filter(s=>chaveSelecao(s)!==chave);gravarBoletim(nova);if(nova.length)abrirBoletim();else{fecharModal();renderizarMercado();}});});
+    const inputV=corpo.querySelector('#valorMultipla');
+    const potEl=corpo.querySelector('#potencialMultipla');
+    inputV.addEventListener('input',()=>{const v=parseFloat(inputV.value)||0;potEl.textContent=`Retorno potencial: ${kz(v*oddTotal)}`;});
+    corpo.querySelector('#confirmarMultipla').addEventListener('click',()=>{
+      const v=parseFloat(inputV.value);
+      if(!v||v<=0)return toast('Introduza um valor válido.','erro');
+      if(v<100)return toast(`A aposta mínima é ${kz(100)}.`,'erro');
+      const sel=obterBoletim();
+      if(!sel.length)return toast('O boletim está vazio.','erro');
+      if(sel.length>MAX_SELECOES)return toast(`Máximo de ${MAX_SELECOES} selecções.`,'erro');
+      const atual=utilizadorAtual();
+      if(v>saldoDisponivel(atual))return toast('Saldo insuficiente. Deposite primeiro.','erro');
+      const eventos=obterEventos();
+      const evMap=new Map(eventos.map(e=>[e.id,e]));
+      for(const s of sel){const ev=evMap.get(s.eventoId);if(!ev||estadoJogo(ev).fase==='terminado')return toast('Uma das selecções já terminou. Actualize o boletim.','erro');}
+      const oddTotalFinal=sel.reduce((p,s)=>p*Number(s.odd),1);
+      atual.saldo-=v;
+      atual.emJogo+=v;
+      // ⚠️ Reduzir bónus bloqueado pelo valor apostado (cumprir wagering)
+      const bonusAntes=Number(atual.bonusSaldo||0);
+      const bonusReduzido=Math.max(0, bonusAntes - v);
+      const desbloqueado = bonusAntes - bonusReduzido;
+      atual.bonusSaldo = bonusReduzido;
+      atual.movimentos.unshift({id:novoId(),descricao:`Aposta múltipla · ${sel.length} selecções (odd ${oddTotalFinal.toFixed(2)})${desbloqueado>0?` · desbloqueou ${kz(desbloqueado)} de bónus`:''}`,valor:v,tipo:'aposta',estado:'aprovado',data:new Date().toISOString()});
+      atual.movimentos=atual.movimentos.slice(0,40);
+      if(!Array.isArray(atual.apostas))atual.apostas=[];
+      atual.apostas.unshift({id:novoId(),tipo:'multipla',selecoes:sel.map(s=>({...s})),valor:v,oddTotal:oddTotalFinal,estado:'ativa',premio:0,data:new Date().toISOString()});
+      atual.apostas=atual.apostas.slice(0,200);
+      atualizarUtilizador(atual);
+      gravarBoletim([]);
+      fecharModal();
+      renderizarTudo();
+      if(desbloqueado>0){
+        toast(`Aposta múltipla de ${kz(v)} registada · odd total ${oddTotalFinal.toFixed(2)} · desbloqueou ${kz(desbloqueado)} de bónus!`,'ganho');
+      } else {
+        toast(`Aposta múltipla de ${kz(v)} registada · odd total ${oddTotalFinal.toFixed(2)}`);
+      }
+    });
+    corpo.querySelector('#limparBoletim').addEventListener('click',()=>{gravarBoletim([]);fecharModal();renderizarMercado();toast('Boletim limpo.');});
+  });
+}
 
 let toastTimer;
 function toast(msg,tipo='ok'){const el=$('#toast');el.textContent=msg;el.className='toast show'+(tipo==='erro'?' erro':(tipo==='ganho'?' ganho':''));clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),5000);}
